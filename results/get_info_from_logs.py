@@ -11,7 +11,7 @@ def get_info_from_logs(
         cpu: str,
         size: str
     ):
-    """.env"""
+    """get information from logs of scenario_run"""
     pick = re.findall(r'(\[.+\])\sTotal\selapsed\stime:\s(\d{1,3}\.\d{4})', string_to_parse)
     for time_elapsed in pick:
         print(time_elapsed[0], time_elapsed[1])

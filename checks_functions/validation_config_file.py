@@ -1,4 +1,4 @@
-""".env"""
+"""Checkers functions for validations"""
 import sys
 import os
 import shutil
@@ -14,7 +14,7 @@ from checks_functions.connectors import check_connector_by_id
 sys.dont_write_bytecode=True
 
 class Env():
-    """.env"""
+    """Class to convert dict to object"""
     id = ""
     run_template= ""
     path_input = ""
@@ -38,7 +38,7 @@ class Env():
 
 
 class Services:
-    """.env"""
+    """Build services class injected to all script"""
     def __init__(
         self,
         api_client,
@@ -54,7 +54,7 @@ class Services:
         self.connector_id = connector_id
 
 def verification(parameter_list: list):
-    """.env"""
+    """Verification de key in list generic"""
     for item in parameter_list[0]:
         if item in parameter_list[1]:
             continue
@@ -72,7 +72,7 @@ def verification(parameter_list: list):
 
 
 def check_root_keys(env, env_object):
-    """.env"""
+    """check key of root config file"""
     list_root_keys = ['azure', 'cosmo_test']
     response = verification([list(env.keys()), list_root_keys])
     if all(response):
@@ -83,7 +83,7 @@ def check_root_keys(env, env_object):
 
 
 def check_azure_keys(azure):
-    """.env"""
+    """check azure keys in config file"""
     list_azure_keys = [
         'tenant_id',
         'client_id',
@@ -102,7 +102,7 @@ def check_azure_keys(azure):
     return (None, False)
 
 def check_cosmo_keys(cosmo):
-    """.env"""
+    """check cosmo keys in config file"""
     list_cosmo_keys = [
         'organization',
         'workspace',
@@ -122,7 +122,7 @@ def check_cosmo_keys(cosmo):
     return (None, False)
 
 def check_cosmo_organization_keys(organization):
-    """.env"""
+    """check organization keys on cosmo_test section config file"""
     list_keys = ['id', 'name']
 
     if not organization:
@@ -136,7 +136,7 @@ def check_cosmo_organization_keys(organization):
 
 
 def check_cosmo_workspace_keys(workspace):
-    """.env"""
+    """check workspace keys on cosmo_test section config file"""
     list_keys = ['id', 'name']
 
     if not workspace:
@@ -150,7 +150,7 @@ def check_cosmo_workspace_keys(workspace):
 
 
 def check_cosmo_solution_keys(solution):
-    """.env"""
+    """check solution keys on cosmo_test section config file"""
     list_keys = ['id', 'name']
 
     if not solution:
@@ -163,7 +163,7 @@ def check_cosmo_solution_keys(solution):
     return (None, False)
 
 def check_cosmo_scenarios_keys(item):
-    """.env"""
+    """check scenarios keys on cosmo_test config file"""
     list_keys = ['name', 'size', 'compute_size', 'dataset']
 
     if not item:
@@ -176,7 +176,7 @@ def check_cosmo_scenarios_keys(item):
     return (None, False)
 
 def check_connector_keys(connector):
-    """.env"""
+    """check connector keys on cosmo_test section config file"""
     list_keys = ['id', 'name']
 
     if not connector:
@@ -190,7 +190,7 @@ def check_connector_keys(connector):
 
 
 def check_dataset_keys(dataset):
-    """.env"""
+    """check dataset keys on cosmo_test section config file"""
     list_keys = ['name','path_input']
     if not dataset:
         print('please add keys in dataset section: ', list_keys)
@@ -202,7 +202,7 @@ def check_dataset_keys(dataset):
 
 
 def verification_path_exists(dataset: object):
-    """.env"""
+    """verificator if scenario path exist"""
     if not dataset.path_input:
         print('The path input of dataset section is empty', 'ex: ./data/scenario_a')
         sys.exit(1)
@@ -217,7 +217,7 @@ def verification_keys_exists(
         workspace: object,
         solution: object
     ):
-    """.env"""
+    """verificator if keys on azure section exist and there are not empty"""
     if not organization.id:
         print('the key id on organization section is empty')
         sys.exit(1)
@@ -236,7 +236,7 @@ def verification_keys_exists(
     return all([organization_bool, workspace_bool, solution_bool])
 
 def check_connector_exists(api_client: object, connector: object):
-    """.env"""
+    """check if connector key exist and is not empty"""
     if not connector.id:
         print('connector id key is empty')
         sys.exit(1)
@@ -252,7 +252,7 @@ def read_config_file() -> dict:
     sys.exit(1)
 
 def get_api_client(azure: object):
-    """.env"""
+    """get api client cosmotech"""
     dictionary = {
         'tenant_id': azure.tenant_id,
         'client_id':azure.client_id,
@@ -271,7 +271,7 @@ def get_api_client(azure: object):
     return ApiClient(configuration)
 
 def check_scenario_structure(cosmo: object):
-    """.env"""
+    """check scenarios structure on config file"""
     for item in cosmo.scenarios:
         check_type = cosmo.scenarios[f"{item}"]
         if isinstance(check_type, str):
@@ -299,7 +299,7 @@ def check_scenario_structure(cosmo: object):
     return True
 
 def check_all_keys_in_config_file(env, env_object: object):
-    """.env"""
+    """check all keys in config file entry"""
     return_ok = True
 
     # root
@@ -352,7 +352,7 @@ def check_all_keys_in_config_file(env, env_object: object):
     sys.exit(1)
 
 def clean_up_data_folder():
-    """.env"""
+    """clean up script folders to run correctly"""
     if os.path.isdir("./data"):
         shutil.rmtree("./data")
 

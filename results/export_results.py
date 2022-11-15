@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def export_results(filename_zip: str):
-    """.env"""
+    """option 1 to results export a pdf"""
     offset_end=50
     interval=20
     filename_results = './logs/performance-test.csv'
@@ -51,7 +51,7 @@ def export_results(filename_zip: str):
 
 
 def export_results_option_2(filename_zip: str):
-    """.env"""
+    """option 2 to results export a pdf"""
     colors = "salmon teal cyan r b g yellow black".split(' ')
     offset_end=20
     interval=20
@@ -99,7 +99,7 @@ def export_results_option_2(filename_zip: str):
 
 
 def export_results_option_3(filename_zip: str):
-    """.env"""
+    """option 3 to results export a pdf"""
     offset_end=50
     interval=20
     filename_results = './logs/performance-test.csv'

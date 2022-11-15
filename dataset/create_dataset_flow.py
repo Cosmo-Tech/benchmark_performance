@@ -7,7 +7,7 @@ from cosmotech_api.model.dataset_connector import DatasetConnector
 from dataset.upload_dataset_files_to_perf_account import upload_files
 
 def create_dataset_http_request(dataset_api_instance, organization_id, dataset_object):
-    """.env"""
+    """create dataset request to cosmotech api"""
     try:
         dataset_created = dataset_api_instance.create_dataset(organization_id, dataset_object)
         print(f"dataset with id  {dataset_created.id} created")
@@ -34,12 +34,12 @@ def upload_local_files_to_azure_storage_container(
         scenario: object,
         dataset_id: str
     ):
-    """.env"""
+    """upload file to azure storage container"""
     upload_files(services, dataset_id, f"{scenario.dataset.path_input}")
 
 
 def build_dataset_with_connector(connector_id, dataset_created):
-    """.env"""
+    """build dataset with connector"""
 
     blob_name = f"%WORKSPACE_FILE%/datasets/{dataset_created.id}"
     dataset_created.connector = DatasetConnector(
@@ -56,7 +56,7 @@ def update_dataset_files_in_azure_storage_container(
         organization_id,
         dataset_created_with_connector
     ):
-    """.env"""
+    """update dataset files in azure storage container"""
     try:
         dataset_updated = dataset_api_instance.update_dataset(
             organization_id,
@@ -69,7 +69,7 @@ def update_dataset_files_in_azure_storage_container(
 
 
 def create_dataset_flow(services: object, scenario: object):
-    """.env"""
+    """create dataset flow: buidl object, creation request, update with connector and upload to storage"""
     dataset_api_instance = dataset_api.DatasetApi(services.api_client)
 
     dataset_object = build_dataset_object(scenario, services)

@@ -4,7 +4,7 @@ from decouple import config
 from azure.storage.blob import BlobServiceClient
 
 def create_container_upsert(container_name: str):
-    """.env"""
+    """create container in storage account"""
     connection_string = config('CONNECTION_STRING')
     if connection_string:
         # blob connection client

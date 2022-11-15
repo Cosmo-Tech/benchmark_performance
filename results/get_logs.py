@@ -25,7 +25,7 @@ def get_status_logs(
         size: str,
         failed = False
     ):
-    """.env"""
+    """get status logs of scenario_run, export to txt file"""
     try:
         logs_response = scenario_run_api_instance.get_scenario_run_cumulated_logs(
             services.organization_id,
@@ -52,7 +52,7 @@ def get_logs(
         scenariorun_id: str,
         scenario_object: object
     ):
-    """.env"""
+    """main get logs from cosmotech api and build csv file"""
     scenario_api_instance = scenario_api.ScenarioApi(services.api_client)
     scenario_run_api_instance = scenariorun_api.ScenariorunApi(services.api_client)
     current_state = ''

@@ -5,7 +5,7 @@ from azure.storage.blob import BlobServiceClient
 from storage.create_container import create_container_upsert
 
 def upload_files(services:object, dataset_id: str, scenario_directory: str):
-    """.env"""
+    """upload files to storage container"""
 
     connection_string = config('CONNECTION_STRING')
 

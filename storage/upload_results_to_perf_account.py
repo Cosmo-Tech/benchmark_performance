@@ -10,7 +10,7 @@ CONTAINER_NAME_RESULTS = "performance-results"
 SUMMARY_ZIP_NAME = "results-summary.zip"
 
 def upload_result_file(services:object) -> str:
-    """.env"""
+    """upoload results files to storage container performance-results"""
     connection_string = config('CONNECTION_STRING')
     # blob connection client
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)

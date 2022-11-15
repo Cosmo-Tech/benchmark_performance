@@ -27,7 +27,7 @@ sys.dont_write_bytecode = True
 
 
 def run_main_flow(services: object, scenario_obj: object):
-    """.env"""
+    """main brenchmark for each scenario: create dataset, create scenario, run scenario, get logs"""
 
     # create dataset
     dataset_created_id = create_dataset_flow(services, scenario_obj)

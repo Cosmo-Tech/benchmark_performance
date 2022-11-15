@@ -4,7 +4,7 @@ from cosmotech_api.model import run_template
 from cosmotech_api.api import solution_api
 
 def replace_run_template(services: object, run_template_id: str, cpu: str = "basicpool"):
-    """.env"""
+    """replace compute size on run_template_id: Lever, MILPOprtimization"""
     solution_api_instance = solution_api.SolutionApi(services.api_client)
     run_template_object = None
     parameter_groups_list = []

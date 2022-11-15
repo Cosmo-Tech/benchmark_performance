@@ -7,9 +7,7 @@ from azure.storage.blob import BlobServiceClient
 CONTAINER_NAME_DATASETS = "performance-datasets"
 
 def download_files(name_file_storage: str):
-    """
-        Download files from storaget performance container datasets
-    """
+    """Download files from storaget performance container datasets"""
     connection_string = config('CONNECTION_STRING')
     # blob connection client
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)

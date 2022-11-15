@@ -7,7 +7,7 @@ from cosmotech_api.api import dataset_api
 from azure.storage.blob import BlobServiceClient
 
 def delete_dataset_workspace(services: object, dataset_input: str, dataset_id: str):
-    """.env"""
+    """delete datatset on workspace storage blob"""
     connection_string = config('CONNECTION_STRING')
     # blob connection client
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)

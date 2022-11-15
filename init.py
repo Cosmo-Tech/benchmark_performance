@@ -1,4 +1,4 @@
-""".env"""
+"""Script to create .env and comsotest.config.yml files"""
 if __name__ == '__main__':
     with open('.env', 'w', encoding='utf-8') as file_env:
         ENV_SAMPLE = """ACCOUNT_NAME=

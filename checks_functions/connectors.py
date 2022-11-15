@@ -1,11 +1,11 @@
-""".env"""
+"""Connector cosmotech api"""
 import sys
 from cosmotech_api import ApiException
 from cosmotech_api.api import connector_api
 sys.dont_write_bytecode=True
 
 def check_connector_by_id(api_client, connector_id: str) -> bool:
-    """.env"""
+    """check if connector id exist"""
     api_instance = connector_api.ConnectorApi(api_client)
     try:
         api_response = api_instance.find_connector_by_id(connector_id)

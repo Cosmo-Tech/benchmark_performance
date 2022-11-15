@@ -2,7 +2,7 @@
 import os
 import glob
 import sys
-import time
+# import time
 from checks_functions.validation_config_file import Env
 from checks_functions.validation_config_file import check_scenario_structure
 from checks_functions.validation_config_file import read_config_file, get_api_client
@@ -11,7 +11,7 @@ from checks_functions.validation_config_file import verification_keys_exists
 from dataset.download_files_from_perf_account import download_files
 
 def get_scenarios() -> dict:
-    """.env"""
+    """retrieve all scenarios from config file"""
     print('Checking configuration...')
 
     env = read_config_file()
@@ -55,11 +55,11 @@ def get_scenarios() -> dict:
     sys.exit(1)
 
 def download_and_unzip_dataset_test_from_storage(name_file_storage: str):
-    """.env"""
+    """download zip file and unzip it"""
     return download_files(name_file_storage)
 
 def check_scenario_item(scenarios_list: list):
-    """.env"""
+    """check scenario items config file"""
     for item in scenarios_list:
         scenario_object = Env(item)
         dictionary_scenario = {
@@ -68,7 +68,6 @@ def check_scenario_item(scenarios_list: list):
             'compute_size': scenario_object.compute_size,
             'dataset': scenario_object.dataset
         }
-        
 
         for item in enumerate(dictionary_scenario):
             if item[1] == 'compute_size':

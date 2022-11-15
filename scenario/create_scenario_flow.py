@@ -8,7 +8,7 @@ from cosmotech_api.model import scenario
 from cosmotech_api.model import scenario_run_template_parameter_value
 
 def get_scenario_description(path_input: str):
-    """.env"""
+    """get scenario description from json file"""
     # opening json file
     file_name = glob.glob(os.path.join(f"./data/{path_input}/","*.json"))[0]
     scenario_description = open(f"{file_name}", 'r', encoding='UTF-8')
@@ -19,7 +19,7 @@ def build_scenario_object(
         scenario_name: str,
         dataset_id: str
     ):
-    """.env"""
+    """build scenario object with parameters values and run_template_id"""
     # get information from json scenario
     run_template_id = scenario_data.get('runTemplateId')
     parameters_values = build_parameter_values(
@@ -36,7 +36,7 @@ def build_scenario_object(
     return scenario_object
 
 def build_parameter_values(parameters_values: object, scenario_name: str):
-    """.env"""
+    """build parameters values"""
     mass_lever_id = "mass_lever_excel_file"
     final_list = []
     for item in parameters_values:
@@ -56,7 +56,7 @@ def build_parameter_values(parameters_values: object, scenario_name: str):
     return final_list
 
 def create_scenario_http_request(scenario_api_instance, services, scenario_object):
-    """.env"""
+    """create scenario request to cosmotech api"""
     try:
         scenario_created = scenario_api_instance.create_scenario(
             services.organization_id,
@@ -69,7 +69,7 @@ def create_scenario_http_request(scenario_api_instance, services, scenario_objec
         print(f"Exception when calling ScenarioApi->create_scenario: {exception}")
 
 def create_scenario_flow(services: object, scenario_obj: object, dataset_id: str):
-    """.env"""
+    """init create scenario flow: build, creation request"""
     # instance scenario api
     scenario_api_instance = scenario_api.ScenarioApi(services.api_client)
 

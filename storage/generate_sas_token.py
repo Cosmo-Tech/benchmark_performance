@@ -9,7 +9,7 @@ CONTAINER_NAME_RESULTS = "performance-results"
 SUMMARY_ZIP_NAME = "results-summary.zip"
 
 def generate_sas_token(services: object, run_test_id: str):
-    """.env"""
+    """Generate sas token to shared your results"""
     account_name = config('ACCOUNT_NAME')
     account_key = config('ACCOUNT_KEY')
     if account_name and account_key:

@@ -2,7 +2,7 @@
 from cosmotech_api.api import scenariorun_api
 
 def run_scenario_flow(services, scenario_id):
-    """.env"""
+    """Run scenario flow: run request cosmotech api"""
     scenario_run_api_instance = scenariorun_api.ScenariorunApi(services.api_client)
 
     scenario_run_object = scenario_run_api_instance.run_scenario(
