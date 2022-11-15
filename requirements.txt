@@ -1,0 +1,7 @@
+azure-storage-blob==12.14.1
+cosmotech-api==2.0.1
+matplotlib==3.6.2
+numpy==1.23.4
+pandas==1.5.1
+python-decouple==3.6
+PyYAML==6.0
