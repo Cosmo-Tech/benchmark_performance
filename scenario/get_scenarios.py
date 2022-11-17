@@ -20,7 +20,7 @@ def get_scenarios() -> dict:
         sys.exit(1)
     env_object = Env(env)
 
-    azure, cosmo, organization, workspace, solution, connector, check_ok = check_all_keys_in_config_file(env, env_object)
+    azure, cosmo, organization, workspace, solution, connector, connector_type, check_ok = check_all_keys_in_config_file(env, env_object)
     if not check_ok:
         sys.exit(1)
 
@@ -51,7 +51,7 @@ def get_scenarios() -> dict:
         check_scenario_item(scenarios_list)
 
         print(f"{len(cosmo.scenarios.keys())} scenario(s)... configuration OK")
-        return (api_client, organization.id, solution.id, workspace.id, cosmo.name_file_storage, connector.id, scenarios_list)
+        return (api_client, organization.id, solution.id, workspace.id, cosmo.name_file_storage, connector, connector_type, scenarios_list)
     sys.exit(1)
 
 def download_and_unzip_dataset_test_from_storage(name_file_storage: str):

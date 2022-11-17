@@ -12,6 +12,8 @@ import sys
 from time import sleep
 from results.get_logs import get_logs
 from results.export_results import export_results
+from results.export_results import export_results_option_2
+from results.export_results import export_results_option_3
 from scenario.get_scenarios import get_scenarios
 from scenario.create_scenario_flow import create_scenario_flow
 # from scenario.delete_scenario import delete_scenario
@@ -31,7 +33,7 @@ def run_main_flow(services: object, scenario_obj: object):
 
     # create dataset
     dataset_created_id = create_dataset_flow(services, scenario_obj)
-
+    # dataset_created_id = "d-8enw3r6rlpqz"
     # Create scenario
     scenario_created = create_scenario_flow(services, scenario_obj, dataset_created_id)
 
@@ -48,7 +50,7 @@ if __name__ == '__main__':
     clean_up_data_folder()
 
     # get global keys
-    api_client, organization_id, solution_id, workspace_id, name_file_storage, connector_id, scenarios = get_scenarios()
+    api_client, organization_id, solution_id, workspace_id, name_file_storage, connector, connector_type, scenarios = get_scenarios()
     if api_client is not None:
         # build services to share
         services_object = Services(
@@ -56,7 +58,9 @@ if __name__ == '__main__':
             organization_id,
             workspace_id,
             solution_id,
-            connector_id
+            connector.id,
+            connector.url,
+            connector_type
         )
 
     # iteration scenarios
@@ -76,6 +80,9 @@ if __name__ == '__main__':
 
     print('Uploading performance results to storage...')
     export_results(name_file_storage)
+    export_results_option_2(name_file_storage)
+    export_results_option_3(name_file_storage)
+    sleep(1)
     zip_results_files()
     RUN_TEST_ID = upload_result_file(services_object)
     generate_sas_token(services_object, RUN_TEST_ID)

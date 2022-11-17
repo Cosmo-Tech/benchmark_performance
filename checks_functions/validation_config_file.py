@@ -16,6 +16,8 @@ sys.dont_write_bytecode=True
 class Env():
     """Class to convert dict to object"""
     id = ""
+    connector_type: ""
+    connector_url: ""
     run_template= ""
     path_input = ""
     compute_size = ""
@@ -46,12 +48,16 @@ class Services:
         workspace_id: str,
         solution_id: str,
         connector_id: str,
+        connector_url: str,
+        connector_type: str,
     ):
         self.api_client = api_client
         self.organization_id = organization_id
         self.workspace_id = workspace_id
         self.solution_id = solution_id
         self.connector_id = connector_id
+        self.connector_url = connector_url,
+        self.connector_type = connector_type
 
 def verification(parameter_list: list):
     """Verification de key in list generic"""
@@ -177,7 +183,7 @@ def check_cosmo_scenarios_keys(item):
 
 def check_connector_keys(connector):
     """check connector keys on cosmo_test section config file"""
-    list_keys = ['id', 'name']
+    list_keys = ['id', 'name', 'url']
 
     if not connector:
         print('please add keys in connector section: ', list_keys)
@@ -339,7 +345,7 @@ def check_all_keys_in_config_file(env, env_object: object):
 
     #check connector exist
     with get_api_client(azure) as api_client:
-        check_ok = check_connector_exists(api_client, connector)
+        connector_type, check_ok = check_connector_exists(api_client, connector)
         if not check_ok:
             sys.exit(1)
 
@@ -348,7 +354,7 @@ def check_all_keys_in_config_file(env, env_object: object):
         sys.exit(1)
 
     if return_ok:
-        return (azure, cosmo, organization, workspace, solution, connector, True)
+        return (azure, cosmo, organization, workspace, solution, connector, connector_type, True)
     sys.exit(1)
 
 def clean_up_data_folder():

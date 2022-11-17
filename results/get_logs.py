@@ -170,7 +170,8 @@ def get_logs(
                 str(scenario_object.size)
             )
         # clean up
-        delete_dataset_workspace(services, scenario_object.dataset.path_input, dataset_id)
+        if services.connector_type != "ADT Connector":
+            delete_dataset_workspace(services, scenario_object.dataset.path_input, dataset_id)
         delete_scenario(services, scenario_id)
     else:
         print("[Failed]")
@@ -185,7 +186,8 @@ def get_logs(
                 True
             )
         # clean up
-        delete_dataset_workspace(services, scenario_object.dataset.path_input, dataset_id)
+        if services.connector_type != "ADT Connector":
+            delete_dataset_workspace(services, scenario_object.dataset.path_input, dataset_id)
         delete_scenario(services, scenario_id)
         print('Uploading performance results to storage...')
         zip_results_files()

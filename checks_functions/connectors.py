@@ -9,7 +9,8 @@ def check_connector_by_id(api_client, connector_id: str) -> bool:
     api_instance = connector_api.ConnectorApi(api_client)
     try:
         api_response = api_instance.find_connector_by_id(connector_id)
-        return bool(api_response)
+        print(api_response.key)
+        return (api_response.key, bool(api_response))
     except ApiException as _exception:
         print(f"The connector with: {connector_id} not exist")
         return False
