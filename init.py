@@ -27,8 +27,9 @@ cosmo_test:
         id: SOL-0xAAgEvr3J                              # your solution (required)
         name: Supply Chain Solution                     # information only (required)
     connector:
-        id: c-q2859zy34wmm                              # connector azure storage (required)
+        id: c-q2859zy34wmm                              # connector AKS or ADT (required)
         name: AKS                                       # information only (required)
+        url: ""                                         # # URL ADT
 
     name_file_storage: scenario_demo_test.zip           # blob name in your 'permformance-datasets' container
     scenarios:

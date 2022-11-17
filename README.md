@@ -184,44 +184,45 @@ Note 1: This is the scenario description (example)
 
 ```yml
 azure:
-    tenant_id: <<your_tenant_id>>
-    client_id: <<your_client_id>>
-    client_secret: <<your_client_secret>>
+    tenant_id: yout_tenant_id
+    client_id: yout_client_id
+    client_secret: yout_client_secret
     cosmo_api_scope: http://dev.api.cosmotech.com/.default
     cosmo_api_host: https://dev.api.cosmotech.com
 
 cosmo_test:
     organization:
-        id: O-gZYpnd27G7
-        name: Cosmo Tech # information only
+        id: O-gZYpnd27G7                                # your organization (required)
+        name: Cosmo Tech                                # information only (required)
     workspace:
-        id: W-QPpQ47r2L9
-        name: Supply Chain Dev # information only
+        id: W-QPpQ47r2L9                                # your workspace (required)
+        name: Supply Chain Dev                          # information only (required)
     solution:
-        id: SOL-0xAAgEvr3J
-        name: Supply Chain Solution # information only
+        id: SOL-0xAAgEvr3J                              # your solution (required)
+        name: Supply Chain Solution                     # information only (required)
     connector:
-        id: c-q2859zy34wmm
-        name: Azure storage connector # information only
-
-    name_file_storage: benchmark_performance.zip # benchmark zip file (example)
+        id: c-q2859zy34wmm                              # connector AKS or ADT (required)
+        name: AKS                                       # information only (required)
+        url: ""                                         # URL ADT
+        
+    name_file_storage: scenario_demo_test.zip           # filename on your 'permformance-datasets' container
     scenarios:
         
-        "1":
-            name: "large dataset basicpool"
-            size: 100000
-            compute_size: "basicpool"
+        "1":                                              # select a name (string required)
+            name: "large basicpool"                       # select a size (number or string required)
+            size: 100000                                  # select a name (string required)
+            compute_size: "basicpool"                     #'basicpool' or 'highcpu'
             dataset:
-                name: "performance large size basicpool"
-                path_input: "scenario_a" # folder name on benchmark zip
+                name: "performance large size basicpool"  # select a name
+                path_input: "scenario_a"                  # folder name in scenario_demo_test.zip
 
         "2":                                            
-            name: "large dataset highcpu"
+            name: "medium highcpu"
             size: 10000
             compute_size: "highcpu"
             dataset:
                 name: "performance large size highcpu"
-                path_input: "scenario_a" # folder name on benchmark zip
+                path_input: "scenario_a"                  # see notes
 ```
 
 </br>
