@@ -180,7 +180,7 @@ def get_logs(
                 services,
                 scenariorun_id,
                 str(scenario_object.name),
-                str(scenario_id),
+                0.0,
                 str(scenario_object.compute_size),
                 str(scenario_object.size),
                 True

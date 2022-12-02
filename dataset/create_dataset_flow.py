@@ -97,10 +97,11 @@ def create_dataset_flow(services: object, scenario: object):
             scenario,
             dataset_created_with_connector.id
         )
-        update_dataset_files_in_azure_storage_container(
-            dataset_api_instance,
-            services.organization_id,
-            dataset_created_with_connector
-        )
+
+    update_dataset_files_in_azure_storage_container(
+        dataset_api_instance,
+        services.organization_id,
+        dataset_created_with_connector
+    )
 
     return dataset_created_with_connector.id

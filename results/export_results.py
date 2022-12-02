@@ -32,7 +32,8 @@ def export_results(filename_zip: str):
         max_list.append(item['duration(s)'].iloc[len(item['step'])-1].max() + item['start_latence'].iloc[len(item['step'])-1].max())
 
     x_max = max(max_list) + offset_end
-    fig, a_x = plt.subplots(1, constrained_layout=True, figsize=(20,20))
+    fig_size = 20 if len(data) >= 4 else 11
+    fig, a_x = plt.subplots(1, constrained_layout=True, figsize=(20,fig_size))
     fig.suptitle(f'Result run test {filename_zip}', fontsize=11)
     a_x.set_xlabel('Duration (s)')
     a_x.set_xlim(left=0, right=x_max)
@@ -80,21 +81,34 @@ def export_results_option_2(filename_zip: str):
 
     x_max = max(max_list) + offset_end
 
-    fig, a_x = plt.subplots(len(data), 1, constrained_layout=True, figsize=(20,20))
-    fig.suptitle(f'Results run test {filename_zip}', fontsize=11)
-    for i, graph in enumerate(data):
-        a_x[i].set_xlabel('Duration (s)')
-        a_x[i].set_xlim(left=0, right=x_max)
-        a_x[i].grid('on', which='major', axis='x' )
-        a_x[i].grid('on', which='major', axis='y' )
-        a_x[i].set_xticks(np.arange(0, x_max, interval))
+    if len(data) > 1:
+        fig_size = 20 if len(data) >= 4 else 11
+        fig, a_x = plt.subplots(len(data), 1, constrained_layout=True, figsize=(20,fig_size))
+        fig.suptitle(f'Results run test {filename_zip}', fontsize=11)
+        for i, graph in enumerate(data):
+            a_x[i].set_xlabel('Duration (s)')
+            a_x[i].set_xlim(left=0, right=x_max)
+            a_x[i].grid('on', which='major', axis='x' )
+            a_x[i].grid('on', which='major', axis='y' )
+            a_x[i].set_xticks(np.arange(0, x_max, interval))
 
-        data = a_x[i].barh(graph['step'], graph['duration(s)'], left=graph['start_latence'], height=0.8, label=graph['scenario_name'].iloc[0], color=colors[i])
-        a_x[i].bar_label(data, labels=graph['duration(s)'], padding=3)
-        a_x[i].legend()
+            data = a_x[i].barh(graph['step'], graph['duration(s)'], left=graph['start_latence'], height=0.8, label=graph['scenario_name'].iloc[0], color=colors[i])
+            a_x[i].bar_label(data, labels=graph['duration(s)'], padding=3)
+            a_x[i].legend()
+    else:
+        fig, a_x = plt.subplots(1, constrained_layout=True, figsize=(20,11))
+        fig.suptitle(f'Results run test {filename_zip}', fontsize=11)
+        a_x.set_xlabel('Duration (s)')
+        a_x.set_xlim(left=0, right=x_max)
+        a_x.grid('on', which='major', axis='x' )
+        a_x.grid('on', which='major', axis='y' )
+        a_x.set_xticks(np.arange(0, x_max, interval))
+
+        graph = a_x.barh(data[0]['step'], data[0]['duration(s)'], left=data[0]['start_latence'], height=0.8, label=data[0]['scenario_name'].iloc[0], color=colors[0])
+        a_x.bar_label(graph, labels=data[0]['duration(s)'], padding=3)
+        a_x.legend()
 
     fig.tight_layout(pad=2.0)
-
     fig.savefig('./logs/scenario_results_option2.pdf', bbox_inches='tight')
 
 
@@ -121,7 +135,8 @@ def export_results_option_3(filename_zip: str):
     x_max = dataframe_original['duration(s)'].max() + dataframe_original['start_latence'].max() + offset_end
     dataframe_original['total'] =  dataframe_original['duration(s)'] + dataframe_original['start_latence']
 
-    fig, a_x = plt.subplots(1, constrained_layout=True, figsize=(20,5))
+    fig_size = 5 if len(dataframe_original['step']) >= 4 else 2
+    fig, a_x = plt.subplots(1, constrained_layout=True, figsize=(20,fig_size))
     fig.suptitle(f'Total {filename_zip}', fontsize=11)
     a_x.set_xlabel('Duration (s)')
     a_x.set_xlim(left=0, right=x_max)
