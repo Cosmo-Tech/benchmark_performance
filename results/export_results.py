@@ -32,7 +32,7 @@ def export_results(filename_zip: str):
         max_list.append(item['duration(s)'].iloc[len(item['step'])-1].max() + item['start_latence'].iloc[len(item['step'])-1].max())
 
     x_max = max(max_list) + offset_end
-    fig, a_x = plt.subplots(1, constrained_layout=True, figsize=(20,11))
+    fig, a_x = plt.subplots(1, constrained_layout=True, figsize=(20,20))
     fig.suptitle(f'Result run test {filename_zip}', fontsize=11)
     a_x.set_xlabel('Duration (s)')
     a_x.set_xlim(left=0, right=x_max)
@@ -80,7 +80,7 @@ def export_results_option_2(filename_zip: str):
 
     x_max = max(max_list) + offset_end
 
-    fig, a_x = plt.subplots(len(data), 1, constrained_layout=True, figsize=(20,12))
+    fig, a_x = plt.subplots(len(data), 1, constrained_layout=True, figsize=(20,20))
     fig.suptitle(f'Results run test {filename_zip}', fontsize=11)
     for i, graph in enumerate(data):
         a_x[i].set_xlabel('Duration (s)')
@@ -121,7 +121,7 @@ def export_results_option_3(filename_zip: str):
     x_max = dataframe_original['duration(s)'].max() + dataframe_original['start_latence'].max() + offset_end
     dataframe_original['total'] =  dataframe_original['duration(s)'] + dataframe_original['start_latence']
 
-    fig, a_x = plt.subplots(1, constrained_layout=True, figsize=(20,2))
+    fig, a_x = plt.subplots(1, constrained_layout=True, figsize=(20,5))
     fig.suptitle(f'Total {filename_zip}', fontsize=11)
     a_x.set_xlabel('Duration (s)')
     a_x.set_xlim(left=0, right=x_max)
