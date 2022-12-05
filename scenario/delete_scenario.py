@@ -7,8 +7,8 @@ def delete_scenario(services, scenario_id):
     scenario_api_instance = scenario_api.ScenarioApi(services.api_client)
     try:
         scenario_api_instance.delete_scenario(
-            services.organization_id,
-            services.workspace_id,
+            services.organization.id,
+            services.workspace.id,
             scenario_id
         )
         print("scenario with id "+ scenario_id + " deleted")

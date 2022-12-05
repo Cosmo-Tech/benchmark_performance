@@ -33,7 +33,6 @@ class Env():
     organization = {}
     workspace = {}
     solution = {}
-
     def __init__(self, env_dict):
         for key in env_dict:
             setattr(self, key, env_dict[key])
@@ -44,20 +43,21 @@ class Services:
     def __init__(
         self,
         api_client,
-        organization_id: str,
-        workspace_id: str,
-        solution_id: str,
-        connector_id: str,
-        connector_url: str,
-        connector_type: str,
+        organization,
+        workspace,
+        solution,
+        connector,
     ):
         self.api_client = api_client
-        self.organization_id = organization_id
-        self.workspace_id = workspace_id
-        self.solution_id = solution_id
-        self.connector_id = connector_id
-        self.connector_url = connector_url,
-        self.connector_type = connector_type
+        self.organization = organization
+        self.workspace = workspace
+        self.solution = solution
+        self.connector = Env({
+            'id': connector.get('id'),
+            'type': connector.get('type'),
+            'name': connector.get('name'),
+            'url': connector.get('url'),
+        })
 
 def verification(parameter_list: list):
     """Verification de key in list generic"""
@@ -157,7 +157,7 @@ def check_cosmo_workspace_keys(workspace):
 
 def check_cosmo_solution_keys(solution):
     """check solution keys on cosmo_test section config file"""
-    list_keys = ['id', 'name']
+    list_keys = ['id', 'name', 'version']
 
     if not solution:
         print('please add keys in solution section: ', list_keys)

@@ -11,9 +11,9 @@
 import sys
 from time import sleep
 from results.get_logs import get_logs
-from results.export_results import export_results
-from results.export_results import export_results_option_2
-from results.export_results import export_results_option_3
+from results.export_results import export_results_detailed
+from results.export_results import export_results_global
+from results.export_results import export_main_report
 from scenario.get_scenarios import get_scenarios
 from scenario.create_scenario_flow import create_scenario_flow
 # from scenario.delete_scenario import delete_scenario
@@ -50,17 +50,20 @@ if __name__ == '__main__':
     clean_up_data_folder()
 
     # get global keys
-    api_client, organization_id, solution_id, workspace_id, name_file_storage, connector, connector_type, scenarios = get_scenarios()
+    api_client, organization, solution, workspace, name_file_storage, connector, connector_type, scenarios = get_scenarios()
     if api_client is not None:
         # build services to share
         services_object = Services(
             api_client,
-            organization_id,
-            workspace_id,
-            solution_id,
-            connector.id,
-            connector.url,
-            connector_type
+            organization,
+            workspace,
+            solution,
+            {
+                'id': connector.id,
+                'name': connector.name,
+                'url': connector.url,
+                'type': connector_type,
+            }
         )
 
     # iteration scenarios
@@ -79,9 +82,9 @@ if __name__ == '__main__':
     replace_run_template(services_object, "basicpool")
 
     print('Uploading performance results to storage...')
-    export_results(name_file_storage)
-    export_results_option_2(name_file_storage)
-    export_results_option_3(name_file_storage)
+    export_results_detailed(name_file_storage)
+    export_results_global(name_file_storage)
+    export_main_report(services_object, name_file_storage)
     sleep(1)
     zip_results_files()
     RUN_TEST_ID = upload_result_file(services_object)

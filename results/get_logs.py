@@ -28,7 +28,7 @@ def get_status_logs(
     """get status logs of scenario_run, export to txt file"""
     try:
         logs_response = scenario_run_api_instance.get_scenario_run_cumulated_logs(
-            services.organization_id,
+            services.organization.id,
             scenariorun_id
         )
         if not failed:
@@ -47,7 +47,8 @@ def get_status_logs(
 
 
 def get_logs(
-        services, dataset_id : str,
+        services, 
+        dataset_id : str,
         scenario_id: str,
         scenariorun_id: str,
         scenario_object: object
@@ -59,8 +60,8 @@ def get_logs(
     while True:
         try:
             scenario = scenario_api_instance.find_scenario_by_id(
-                services.organization_id,
-                services.workspace_id,
+                services.organization.id,
+                services.workspace.id,
                 scenario_id
             )
             scenario_state = str(scenario.state)
@@ -81,7 +82,7 @@ def get_logs(
         # get the status for the ScenarioRun
         try:
             api_response = scenario_run_api_instance.get_scenario_run_status(
-                services.organization_id,
+                services.organization.id,
                 scenariorun_id
             )
         except ApiException as exception:
@@ -133,7 +134,6 @@ def get_logs(
 
         df_log['latence_steps'] = pd.Series(n_temp)
         df_log['total_latence'] = df_log['latence_steps'] + df_log['diff_end_date_and_last_start']
-        
         # df_log['dataset_id'] = dataset_id
         df_log['scenario_id'] = scenario_id
         df_log['cpu'] = scenario_object.compute_size
@@ -170,11 +170,11 @@ def get_logs(
                 str(scenario_object.size)
             )
         # clean up
-        if services.connector_type != "ADT Connector":
+        if services.connector.type != "ADT Connector":
             delete_dataset_workspace(services, scenario_object.dataset.path_input, dataset_id)
         delete_scenario(services, scenario_id)
     else:
-        print("[Failed]")
+        print(f"[{current_state}]")
         get_status_logs(
                 scenario_run_api_instance,
                 services,
@@ -186,7 +186,7 @@ def get_logs(
                 True
             )
         # clean up
-        if services.connector_type != "ADT Connector":
+        if services.connector.type != "ADT Connector":
             delete_dataset_workspace(services, scenario_object.dataset.path_input, dataset_id)
         delete_scenario(services, scenario_id)
         print('Uploading performance results to storage...')

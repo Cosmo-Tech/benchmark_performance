@@ -59,8 +59,8 @@ def create_scenario_http_request(scenario_api_instance, services, scenario_objec
     """create scenario request to cosmotech api"""
     try:
         scenario_created = scenario_api_instance.create_scenario(
-            services.organization_id,
-            services.workspace_id,
+            services.organization.id,
+            services.workspace.id,
             scenario_object
         )
         print(f"scenario with id: {scenario_created.id} / {scenario_created.state}", scenario_created.name)

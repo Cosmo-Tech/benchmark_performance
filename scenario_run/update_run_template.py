@@ -4,7 +4,7 @@ from cosmotech_api.model import run_template
 from cosmotech_api.api import solution_api
 
 def replace_run_template(services: object, run_template_id: str, cpu: str = "basicpool"):
-    """replace compute size on run_template_id: Lever, MILPOprtimization"""
+    """replace compute size on run_template_id: Lever, MILPOprtimization, UncertaintyAnalysis, SensitivityAnalysis"""
     solution_api_instance = solution_api.SolutionApi(services.api_client)
     run_template_object = None
     parameter_groups_list = []
@@ -24,6 +24,28 @@ def replace_run_template(services: object, run_template_id: str, cpu: str = "bas
             "mass_action_lever",
             "optimization",
             "model_behavior",
+            "demand_plan_group",
+            "transport_duration_group",
+            "production_resource_opening_time_group"
+        ]
+    elif str(run_template_id).lower().strip() == "uncertaintyanalysis":
+        parameter_groups_list = [
+            "simulation",
+            "mass_action_lever",
+            "flow_management_policies",
+            "model_behavior",
+            "uncertainty_analysis",
+            "demand_plan_group",
+            "transport_duration_group",
+            "production_resource_opening_time_group"
+        ]
+    elif str(run_template_id).lower().strip() == "sensitivityanalysis":
+        parameter_groups_list = [
+            "simulation",
+            "mass_action_lever",
+            "flow_management_policies",
+            "model_behavior",
+            "sensitivity_analysis",
             "demand_plan_group",
             "transport_duration_group",
             "production_resource_opening_time_group"
@@ -58,10 +80,9 @@ def replace_run_template(services: object, run_template_id: str, cpu: str = "bas
             parameter_groups= parameter_groups_list,
             stack_steps= True,
         )
-
     solution_api_instance.add_or_replace_run_templates(
-        organization_id=services.organization_id,
-        solution_id=services.solution_id,
+        organization_id=services.organization.id,
+        solution_id=services.solution.id,
         run_template=[run_template_object]
     )
     return run_template_object

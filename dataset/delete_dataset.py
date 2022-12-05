@@ -12,8 +12,8 @@ def delete_dataset_workspace(services: object, dataset_input: str, dataset_id: s
     # blob connection client
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
 
-    organization_id_lower = str(services.organization_id).lower()
-    workspace_id_lower = str(services.workspace_id).lower()
+    organization_id_lower = str(services.organization.id).lower()
+    workspace_id_lower = str(services.workspace.id).lower()
 
     container_client = blob_service_client.get_container_client(organization_id_lower)
 
@@ -32,7 +32,7 @@ def delete_scenario_http_request(services: object, dataset_id: str):
     """Delete scenario from database"""
     dataset_api_instance = dataset_api.DatasetApi(services.api_client)
     try:
-        dataset_api_instance.delete_dataset(services.organization_id, dataset_id)
+        dataset_api_instance.delete_dataset(services.organization.id, dataset_id)
     except ApiException as exception:
         print(f"Exception when calling DatasetApi->delete_scenario: {exception}")
         sys.exit(1)

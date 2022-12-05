@@ -15,8 +15,8 @@ def generate_sas_token(services: object, run_test_id: str):
     if account_name and account_key:
         container_name=CONTAINER_NAME_RESULTS
 
-        organizarion_id_lower = str(services.organization_id).lower()
-        workspace_id_lower = str(services.workspace_id).lower()
+        organizarion_id_lower = str(services.organization.id).lower()
+        workspace_id_lower = str(services.workspace.id).lower()
         file_to_download = SUMMARY_ZIP_NAME
         blob_name=f"{organizarion_id_lower}/{workspace_id_lower}/results/{date.today().isoformat()}/{run_test_id}/{file_to_download}"
 

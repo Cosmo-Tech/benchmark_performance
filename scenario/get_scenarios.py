@@ -51,7 +51,7 @@ def get_scenarios() -> dict:
         check_scenario_item(scenarios_list)
 
         print(f"{len(cosmo.scenarios.keys())} scenario(s)... configuration OK")
-        return (api_client, organization.id, solution.id, workspace.id, cosmo.name_file_storage, connector, connector_type, scenarios_list)
+        return (api_client, organization, solution, workspace, cosmo.name_file_storage, connector, connector_type, scenarios_list)
     sys.exit(1)
 
 def download_and_unzip_dataset_test_from_storage(name_file_storage: str):
@@ -71,8 +71,8 @@ def check_scenario_item(scenarios_list: list):
 
         for item in enumerate(dictionary_scenario):
             if item[1] == 'compute_size':
-                if not dictionary_scenario.get(item[1]) in ["highcpu", "basicpool"]:
-                    print("check your compute_size value: 'basicpool' or 'highcpu' (case sensitive)")
+                if not dictionary_scenario.get(item[1]) in ["highcpu", "basicpool", "memory"]:
+                    print("check your compute_size value: 'basicpool', 'highcpu', 'memory' (case sensitive)")
                     sys.exit(1)
 
             if not dictionary_scenario.get(item[1]):

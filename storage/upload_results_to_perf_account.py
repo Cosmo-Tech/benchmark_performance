@@ -20,8 +20,8 @@ def upload_result_file(services:object) -> str:
     file_to_upload = SUMMARY_ZIP_NAME
 
     # Create a blob client using the local file name as the name for the blob
-    organizarion_id_lower = str(services.organization_id).lower()
-    workspace_id_lower = str(services.workspace_id).lower()
+    organizarion_id_lower = str(services.organization.id).lower()
+    workspace_id_lower = str(services.workspace.id).lower()
 
     blob_client = blob_service_client.get_blob_client(
         container=CONTAINER_NAME_RESULTS,

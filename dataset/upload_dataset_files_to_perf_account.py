@@ -13,8 +13,8 @@ def upload_files(services:object, dataset_id: str, scenario_directory: str):
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
 
     # path blob name
-    organizarion_id_lower = str(services.organization_id).lower()
-    workspace_id_lower = str(services.workspace_id).lower()
+    organizarion_id_lower = str(services.organization.id).lower()
+    workspace_id_lower = str(services.workspace.id).lower()
     dataset_id_id_lower = str(dataset_id).lower()
 
     # create is not exists

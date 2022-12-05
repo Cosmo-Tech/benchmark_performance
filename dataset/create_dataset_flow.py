@@ -25,7 +25,7 @@ def build_dataset_object(scenario: object, services):
             "Performance Test CosmoTest",
         ],
         connector=DatasetConnector(
-            id=services.connector_id,
+            id=services.connector.id,
         ),
     )
 
@@ -37,12 +37,12 @@ def upload_local_files_to_azure_storage_container(
     """upload file to azure storage container"""
     upload_files(services, dataset_id, f"{scenario.dataset.path_input}")
 
-def build_dataset_with_connector(connector_id, dataset_created, connector_type, connector_url):
+def build_dataset_with_connector(connector, dataset_created):
     """build dataset with connector"""
-    connector_url = f"{connector_url[0]}"
-    if connector_type == "ADT Connector":
+    connector_url = connector.url
+    if connector.type == "ADT Connector":
         dataset_created.connector = DatasetConnector(
-                id=connector_id,
+                id=connector.id,
                 parameters_values= {
                     "AZURE_DIGITAL_TWINS_URL": connector_url
                 }
@@ -50,7 +50,7 @@ def build_dataset_with_connector(connector_id, dataset_created, connector_type, 
     else:
         blob_name = f"%WORKSPACE_FILE%/datasets/{dataset_created.id}"
         dataset_created.connector = DatasetConnector(
-                id=connector_id,
+                id=connector.id,
                 parameters_values= {
                     "AZURE_STORAGE_CONNECTION_STRING": f"{config('CONNECTION_STRING')}",
                     "AZURE_STORAGE_CONTAINER_BLOB_PREFIX": blob_name
@@ -82,16 +82,14 @@ def create_dataset_flow(services: object, scenario: object):
     dataset_object = build_dataset_object(scenario, services)
     dataset_created = create_dataset_http_request(
         dataset_api_instance,
-        services.organization_id,
+        services.organization.id,
         dataset_object
     )
     dataset_created_with_connector = build_dataset_with_connector(
-        services.connector_id,
-        dataset_created,
-        services.connector_type,
-        services.connector_url
+        services.connector,
+        dataset_created
     )
-    if services.connector_type != "ADT Connector":
+    if services.connector.type != "ADT Connector":
         upload_local_files_to_azure_storage_container(
             services,
             scenario,
@@ -100,7 +98,7 @@ def create_dataset_flow(services: object, scenario: object):
 
     update_dataset_files_in_azure_storage_container(
         dataset_api_instance,
-        services.organization_id,
+        services.organization.id,
         dataset_created_with_connector
     )
 
