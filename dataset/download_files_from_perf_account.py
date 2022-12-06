@@ -6,7 +6,7 @@ from azure.storage.blob import BlobServiceClient
 
 CONTAINER_NAME_DATASETS = "performance-datasets"
 
-def download_files(name_file_storage: str):
+def download_files(path_data, name_file_storage: str):
     """Download files from storaget performance container datasets"""
     connection_string = config('CONNECTION_STRING')
     # blob connection client
@@ -20,9 +20,9 @@ def download_files(name_file_storage: str):
         sys.exit(1)
 
     blob_name = name_file_storage
-    with open(file=f"./data/{blob_name}", mode="wb") as download_file:
+    with open(file=f"{path_data}/{blob_name}", mode="wb") as download_file:
         download_file.write(container_client.download_blob(blob_name).readall())
 
-    with zipfile.ZipFile(f"./data/{blob_name}") as zip_file:
-        zip_file.extractall("./data")
+    with zipfile.ZipFile(f"{path_data}/{blob_name}") as zip_file:
+        zip_file.extractall(path_data)
     return True

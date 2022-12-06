@@ -7,10 +7,10 @@ from cosmotech_api.api import scenario_api
 from cosmotech_api.model import scenario
 from cosmotech_api.model import scenario_run_template_parameter_value
 
-def get_scenario_description(path_input: str):
+def get_scenario_description(services, path_input: str):
     """get scenario description from json file"""
     # opening json file
-    file_name = glob.glob(os.path.join(f"./data/{path_input}/","*.json"))[0]
+    file_name = glob.glob(os.path.join(f"{services.paths.data}/{path_input}/","*.json"))[0]
     scenario_description = open(f"{file_name}", 'r', encoding='UTF-8')
     return json.load(scenario_description)
 
@@ -74,7 +74,7 @@ def create_scenario_flow(services: object, scenario_obj: object, dataset_id: str
     scenario_api_instance = scenario_api.ScenarioApi(services.api_client)
 
     # get scenario description
-    scenario_data = get_scenario_description(f"{scenario_obj.dataset.path_input}")
+    scenario_data = get_scenario_description(services, f"{scenario_obj.dataset.path_input}")
     # create new scenario
     scenario_object = build_scenario_object(
         scenario_data,

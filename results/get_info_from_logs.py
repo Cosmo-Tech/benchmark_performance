@@ -4,6 +4,7 @@ import re
 import pandas as pd
 
 def get_info_from_logs(
+        path_logs,
         string_to_parse: str,
         scenario_name: str,
         max_start_latence,
@@ -40,5 +41,5 @@ def get_info_from_logs(
             n_temp.append(latence_temp)
 
     d_f['start_latence'] = pd.Series(n_temp)
-    write_headers = False if os.path.isfile("./logs/performance-steps.csv") else True
-    d_f.to_csv("./logs/performance-steps.csv", mode='a', header=write_headers, index=False)
+    write_headers = False if os.path.isfile(f"{path_logs}/performance-steps.csv") else True
+    d_f.to_csv(f"{path_logs}/performance-steps.csv", mode='a', header=write_headers, index=False)

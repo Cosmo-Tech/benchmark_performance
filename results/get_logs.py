@@ -26,6 +26,7 @@ def get_status_logs(
         failed = False
     ):
     """get status logs of scenario_run, export to txt file"""
+    path_logs = services.paths.logs
     try:
         logs_response = scenario_run_api_instance.get_scenario_run_cumulated_logs(
             services.organization.id,
@@ -33,21 +34,22 @@ def get_status_logs(
         )
         if not failed:
             get_info_from_logs(
+                path_logs,
                 str(logs_response),
                 scenario_name,
                 max_start_latence,
                 scenario_id,
-                cpu, 
+                cpu,
                 size
             )
-        with codecs.open(f"./logs/scenariorun-logs-{scenario_name}.txt", 'w', encoding='utf-8') as file:
+        with codecs.open(f"{path_logs}/scenariorun-logs-{scenario_name}.txt", 'w', encoding='utf-8') as file:
             pprint(logs_response, file)
     except ApiException as exception:
         print(f"Exception when calling ScenariorunApi->get_scenario_run_cumulated_logs: {exception}")
 
 
 def get_logs(
-        services, 
+        services,
         dataset_id : str,
         scenario_id: str,
         scenariorun_id: str,
@@ -155,7 +157,7 @@ def get_logs(
         ]
 
         # write performance indicators to a local csv
-        log_path = "./logs/performance-test.csv"
+        log_path = f"{services.paths.logs}/performance-test.csv"
         write_headers = False if os.path.isfile(log_path) else True
         print('[...Exporting performance results...]')
         df_log.to_csv(log_path, mode='a', header=write_headers, index=False)
@@ -190,7 +192,7 @@ def get_logs(
             delete_dataset_workspace(services, scenario_object.dataset.path_input, dataset_id)
         delete_scenario(services, scenario_id)
         print('Uploading performance results to storage...')
-        zip_results_files()
+        zip_results_files(services)
         run_test_id = upload_result_file(services)
         generate_sas_token(services, run_test_id)
         sys.exit(1)

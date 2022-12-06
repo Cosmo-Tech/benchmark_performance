@@ -5,18 +5,17 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-
-def export_results(filename_zip: str):
+def export_results(path_logs, filename_zip: str):
     """option 1 to results export a pdf"""
     offset_end=50
     interval=20
-    filename_results = './logs/performance-test.csv'
+    filename_results = f'{path_logs}/performance-test.csv'
 
     dataframe_original = pd.read_csv(f'{filename_results}')
     dataframe_original['start_date'] = pd.to_datetime(dataframe_original['start_date'])
     scenario_list = dataframe_original.groupby(['scenario_id'])
 
-    original_df_steps = pd.read_csv('./logs/performance-steps.csv')
+    original_df_steps = pd.read_csv(f'{path_logs}/performance-steps.csv')
     original_df_steps['start_date'] = pd.to_datetime(original_df_steps['start_date'])
 
     dataframe_original = pd.concat([dataframe_original, original_df_steps])
@@ -51,17 +50,17 @@ def export_results(filename_zip: str):
     a_x.legend()
     fig.tight_layout(pad=2.0)
 
-    fig.savefig('./logs/scenario_results.pdf', bbox_inches='tight')
+    fig.savefig(f'{path_logs}/scenario_results.pdf', bbox_inches='tight')
 
 
-def export_results_detailed(filename_zip: str):
+def export_results_detailed(path_logs, filename_zip: str):
     """option 2 to results export a pdf"""
     colors = "salmon teal cyan r b g yellow black".split(' ')
-    dataframe_original = pd.read_csv('./logs/performance-test.csv')
+    dataframe_original = pd.read_csv(f'{path_logs}/performance-test.csv')
     dataframe_original['start_date'] = pd.to_datetime(dataframe_original['start_date'])
     scenario_list = dataframe_original.groupby(['scenario_id'])
 
-    original_df_steps = pd.read_csv('./logs/performance-steps.csv')
+    original_df_steps = pd.read_csv(f'{path_logs}/performance-steps.csv')
     original_df_steps['start_date'] = pd.to_datetime(original_df_steps['start_date'])
 
     dataframe_original = pd.concat([dataframe_original, original_df_steps])
@@ -108,20 +107,20 @@ def export_results_detailed(filename_zip: str):
         a_x.legend()
 
     fig.tight_layout(pad=2.0)
-    fig.savefig('./logs/scenario_results_detailed.pdf', bbox_inches='tight')
+    fig.savefig(f'{path_logs}/scenario_results_detailed.pdf', bbox_inches='tight')
 
 
-def export_results_global(filename_zip: str):
+def export_results_global(path_logs, filename_zip: str):
     """option 3 to results export a pdf"""
     offset_end=50
     interval=20
-    filename_results = './logs/performance-test.csv'
+    filename_results = f'{path_logs}/performance-test.csv'
 
     dataframe_original = pd.read_csv(f'{filename_results}')
     dataframe_original['start_date'] = pd.to_datetime(dataframe_original['start_date'])
     # scenario_list = dataframe_original.groupby(['scenario_name'])
 
-    original_df_steps = pd.read_csv('./logs/performance-steps.csv')
+    original_df_steps = pd.read_csv(f'{path_logs}/performance-steps.csv')
     original_df_steps['start_date'] = pd.to_datetime(original_df_steps['start_date'])
 
     dataframe_original = pd.concat([dataframe_original, original_df_steps])
@@ -146,12 +145,13 @@ def export_results_global(filename_zip: str):
     graph = a_x.barh(dataframe_original['step'], dataframe_original['total'], height=0.8)
     a_x.bar_label(graph, labels=dataframe_original['total'], padding=3)
 
-    fig.savefig('./logs/scenario_results_global.pdf', bbox_inches='tight')
+    fig.savefig(f'{path_logs}/scenario_results_global.pdf', bbox_inches='tight')
 
 
 def export_main_report(services_object, filename_zip: str):
     """Main report"""
-    dataframe_original = pd.read_csv('performance-test.csv')
+    path_logs = services_object.paths.logs
+    dataframe_original = pd.read_csv(f'{path_logs}/performance-test.csv')
     dataframe_original['start_date'] = pd.to_datetime(dataframe_original['start_date'])
 
     # List scenario names
@@ -163,10 +163,11 @@ def export_main_report(services_object, filename_zip: str):
     for cpu in scenario_list:
         data.append(dataframe_original[dataframe_original['cpu'] == str(cpu)])
 
-    #################################################
-    fig, axs = plt.subplots(1, figsize=(15,8))
-    plt.subplots_adjust(wspace=0.6, hspace=0.5)
 
+    fig, axs = plt.subplots(3,1, figsize=(15,15))
+    fig.suptitle(f'Result performance test {filename_zip}', fontsize=11)
+    plt.subplots_adjust(wspace=0.6, hspace=0.5)
+    #################################################
     for item in data:
         max_list = []
         size_list = []
@@ -184,20 +185,18 @@ def export_main_report(services_object, filename_zip: str):
         for i,duration in enumerate(max_list):
             result.update({ size_list[i]: duration})
 
-        result = { k: v for k, v in sorted(result.items(), key=lambda item: sub_item[0]) }
+        result = { k: v for k, v in sorted(result.items(), key=lambda item: item[1]) }
         result_by_cpu.append(result)
         result_x = np.array(list(result.keys()))
         result_y = np.array(list(result.values()))
 
-        axs.grid('on', which='major', axis='x' )
-        axs.grid('on', which='major', axis='y' )
-        axs.set(xlabel='Dataset size', ylabel='Execution time (s)')
-        axs.plot(result_x, result_y, label=item['cpu'].iloc[0])
-
+        axs[1].grid('on', which='major', axis='x' )
+        axs[1].grid('on', which='major', axis='y' )
+        axs[1].set(xlabel='Dataset size', ylabel='Execution time (s)')
+        axs[1].plot(result_x, result_y, label=item['cpu'].iloc[0])
+        axs[1].legend()
     ###############################################
-    fig, axs = plt.subplots(1, figsize=(15,6))
-    fig.suptitle(f'Result run test {filename_zip}', fontsize=11)
-    axs.set_axis_off()
+    axs[0].set_axis_off()
     interline = 0.05
     now = datetime.now()
     summary_headers = {
@@ -222,37 +221,36 @@ def export_main_report(services_object, filename_zip: str):
     margin_list = [len(w) for w in summary_headers]
     margin = max(margin_list)
     y_origin = 0
-    for k, (head, v) in enumerate(summary_headers.items()):
+    for k, (head, valor) in enumerate(summary_headers.items()):
         x_origin = 0
-        axs.text(x_origin, 1-y_origin-interline*(k+1), str(head), fontsize=12, weight='bold', color="salmon")
-        if isinstance(v, dict):
+        axs[0].text(x_origin, 1-y_origin-interline*(k+1), str(head), fontsize=12, weight='bold', color="salmon")
+        if isinstance(valor, dict):
             offset_inner = 0.01
             x_origin = x_origin + offset_inner
-            for p, (subtitle, v) in enumerate(v.items()):
+            for subtitle, valor in valor.items():
                 y_origin = y_origin + interline
-                axs.text(x_origin, 1-y_origin-interline*(k+1), f'• {str(subtitle)}', fontsize=12)
-                axs.text(x_origin+int(margin)/100-offset_inner, 1-y_origin-interline*(k+1), str(v), fontsize=12)
+                axs[0].text(x_origin, 1-y_origin-interline*(k+1), f'• {str(subtitle)}', fontsize=12)
+                axs[0].text(x_origin+int(margin)/100-offset_inner, 1-y_origin-interline*(k+1), str(valor), fontsize=12)
         else:
-            axs.text(x_origin+int(margin)/100, 1-y_origin-interline*(k+1), str(v), fontsize=12, color="salmon", weight='bold')
+            axs[0].text(x_origin+int(margin)/100, 1-y_origin-interline*(k+1), str(valor), fontsize=12, color="salmon", weight='bold')
 
     #################################################
     d_t = pd.DataFrame(result_by_cpu)
     d_t = d_t.transpose()
-    d_t[2] = ((d_t[1]-d_t[0])/d_t[0]).apply(lambda x: round(x, 2))
-    fig, axs = plt.subplots(1, figsize=(5,len(x)))
-    plt.subplots_adjust(wspace=0.6, hspace=0.5)
-    axs.set_axis_off()
-    scenario_list.append('variation %')
-    axs.table(
-        cellText = [[ f for f in d_t.iloc[i]] for i,r in enumerate(d_t)],  
-        rowLabels = [f"Dataset size: {x[i]}" for i in d_t],  
-        colLabels = scenario_list,
-        cellColours = [[ "#85BB65" if float(c) < 300.0 else "#fd9b93" for c in d_t.iloc[i]] for i,r in enumerate(d_t)],
-        rowColours =["#FAF4D3"] * len(d_t),
-        colColours =["#FAF4D3"] * len(d_t),
-        cellLoc ='center',
-        loc ='upper left')
+    d_t.to_csv(f"{path_logs}/performance-capacity.csv", mode='a', header=True, index=False)
+    axs[2].set_axis_off()
+    if len(d_t) >= 2:
+        axs[2].table(
+            cellText = [[ f'{val} s' for val in d_t.iloc[i]] for i,r in enumerate(d_t.index)],
+            rowLabels = [f"Dataset size: {result_x[i]}" for i,r in enumerate(d_t.index)],
+            colLabels = scenario_list,
+            cellColours = [[ "#85BB65" if float(c) < 300.0 else "#fd9b93" for c in d_t.iloc[i]] for i,r in enumerate(d_t.index)],
+            rowColours =["#FAF4D3"] * len(d_t.index),
+            colColours =["#FAF4D3"] * len(d_t.index),
+            cellLoc ='center',
+            loc ='upper left')
 
     #################################################
     plt.tight_layout()
-    fig.savefig('./scenario_results_report.pdf', bbox_inches='tight')
+
+    fig.savefig(f'{path_logs}/scenario_results_report.pdf', bbox_inches='tight')

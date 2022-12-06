@@ -47,6 +47,7 @@ class Services:
         workspace,
         solution,
         connector,
+        paths
     ):
         self.api_client = api_client
         self.organization = organization
@@ -57,6 +58,11 @@ class Services:
             'type': connector.get('type'),
             'name': connector.get('name'),
             'url': connector.get('url'),
+        })
+        self.paths = Env({
+            'data': paths.get('data'),
+            'logs': paths.get('logs'),
+            'summary': paths.get('summary')
         })
 
 def verification(parameter_list: list):
@@ -207,14 +213,14 @@ def check_dataset_keys(dataset):
     return (None, False)
 
 
-def verification_path_exists(dataset: object):
+def verification_path_exists(path_data, dataset: object):
     """verificator if scenario path exist"""
     if not dataset.path_input:
-        print('The path input of dataset section is empty', 'ex: ./data/scenario_a')
+        print('The path input of dataset section is empty', f'ex: {path_data}/scenario_a')
         sys.exit(1)
-    input_bool = os.path.isdir(f'./data/{dataset.path_input}')
+    input_bool = os.path.isdir(f'{path_data}/{dataset.path_input}')
     if not input_bool:
-        print(f"The path './data/{dataset.path_input}' not exist")
+        print(f"The path '{path_data}/{dataset.path_input}' not exist")
     return all([input_bool])
 
 def verification_keys_exists(
@@ -248,10 +254,11 @@ def check_connector_exists(api_client: object, connector: object):
         sys.exit(1)
     return check_connector_by_id(api_client, connector.id)
 
-def read_config_file() -> dict:
+def read_config_file(home) -> dict:
     """.env"""
-    if os.path.isfile('cosmotest.config.yml'):
-        with open('cosmotest.config.yml', "r", encoding="UTF-8") as config_file:
+    cosmotest = os.path.join(home, 'cosmotest.config.yml')
+    if os.path.isfile(cosmotest):
+        with open(cosmotest, "r", encoding="UTF-8") as config_file:
             data = yaml.load(config_file, Loader=SafeLoader)
             return data
     print("No config file: cosmotest.config.yml", "please create it before run the test script")
@@ -276,7 +283,7 @@ def get_api_client(azure: object):
     configuration = get_configuration(azure.cosmo_api_host, token)
     return ApiClient(configuration)
 
-def check_scenario_structure(cosmo: object):
+def check_scenario_structure(path_data, cosmo: object):
     """check scenarios structure on config file"""
     for item in cosmo.scenarios:
         check_type = cosmo.scenarios[f"{item}"]
@@ -297,7 +304,7 @@ def check_scenario_structure(cosmo: object):
             sys.exit(1)
 
         # verification if path exist
-        path_exists = verification_path_exists(dataset)
+        path_exists = verification_path_exists(path_data, dataset)
         if not path_exists:
             sys.exit(1)
 
@@ -357,15 +364,15 @@ def check_all_keys_in_config_file(env, env_object: object):
         return (azure, cosmo, organization, workspace, solution, connector, connector_type, True)
     sys.exit(1)
 
-def clean_up_data_folder():
+def clean_up_data_folder(path_data, path_logs, path_summary):
     """clean up script folders to run correctly"""
-    if os.path.isdir("./data"):
-        shutil.rmtree("./data")
+    if os.path.isdir(path_data):
+        shutil.rmtree(path_data)
 
-    if os.path.isdir("./logs"):
-        shutil.rmtree("./logs")
-    os.mkdir("./logs")
+    if os.path.isdir(path_logs):
+        shutil.rmtree(path_logs)
+    os.mkdir(path_logs)
 
-    if os.path.isdir("./summary"):
-        shutil.rmtree("./summary")
-    os.mkdir("./summary")
+    if os.path.isdir(path_summary):
+        shutil.rmtree(path_summary)
+    os.mkdir(path_summary)

@@ -10,11 +10,11 @@ from checks_functions.validation_config_file import check_all_keys_in_config_fil
 from checks_functions.validation_config_file import verification_keys_exists
 from dataset.download_files_from_perf_account import download_files
 
-def get_scenarios() -> dict:
+def get_scenarios(path_data,HOME) -> dict:
     """retrieve all scenarios from config file"""
     print('Checking configuration...')
 
-    env = read_config_file()
+    env = read_config_file(HOME)
     if not env:
         print("Please add configuration in config file.")
         sys.exit(1)
@@ -34,31 +34,31 @@ def get_scenarios() -> dict:
         )
 
     if environment_cosmo_is_ok:
-        if not os.path.isdir("./data"):
-            os.mkdir('./data')
-            data_directory = os.listdir("./data")
+        if not os.path.isdir(path_data):
+            os.mkdir(path_data)
+            data_directory = os.listdir(path_data)
             if len(data_directory) == 0:
-                download = download_and_unzip_dataset_test_from_storage(cosmo.name_file_storage)
+                download = download_and_unzip_dataset_test_from_storage(path_data, cosmo.name_file_storage)
                 if not download:
                     sys.exit(1)
 
-        check_ok = check_scenario_structure(cosmo)
+        check_ok = check_scenario_structure(path_data, cosmo)
         if not check_ok:
             sys.exit(1)
 
         # check scenario items
         scenarios_list = [cosmo.scenarios[f"{item}"] for item in cosmo.scenarios]
-        check_scenario_item(scenarios_list)
+        check_scenario_item(path_data, scenarios_list)
 
         print(f"{len(cosmo.scenarios.keys())} scenario(s)... configuration OK")
         return (api_client, organization, solution, workspace, cosmo.name_file_storage, connector, connector_type, scenarios_list)
     sys.exit(1)
 
-def download_and_unzip_dataset_test_from_storage(name_file_storage: str):
+def download_and_unzip_dataset_test_from_storage(path_data, name_file_storage: str):
     """download zip file and unzip it"""
-    return download_files(name_file_storage)
+    return download_files(path_data, name_file_storage)
 
-def check_scenario_item(scenarios_list: list):
+def check_scenario_item(path_data, scenarios_list: list):
     """check scenario items config file"""
     for item in scenarios_list:
         scenario_object = Env(item)
@@ -90,23 +90,23 @@ def check_scenario_item(scenarios_list: list):
                 print(f'the key : {item[1]} on dataset section is empty')
                 sys.exit(1)
 
-        scenario_folder = os.listdir(f'./data/{dataset_object.path_input}')
+        scenario_folder = os.listdir(f'{path_data}/{dataset_object.path_input}')
         if len(scenario_folder) == 0:
             print('folder empty', dataset_object.path_input, "no dataset folder")
             sys.exit(1)
 
-        dataset_dir_exist = os.path.isdir(os.path.join(f'./data/{dataset_object.path_input}','dataset'))
+        dataset_dir_exist = os.path.isdir(os.path.join(f'{path_data}/{dataset_object.path_input}','dataset'))
         if not dataset_dir_exist:
             print('not dataset folder in scenario', dataset_object.path_input)
             sys.exit(1)
 
-        json_file_name = glob.glob(os.path.join(f"./data/{dataset_object.path_input}/","*.json"))
+        json_file_name = glob.glob(os.path.join(f"{path_data}/{dataset_object.path_input}/","*.json"))
         if len(json_file_name) == 0:
             print('No json scenario file in:', dataset_object.path_input)
             sys.exit(1)
 
         # check is dataset folder is empty
-        files_in_dataset_folder = glob.glob(os.path.join(f"./data/{dataset_object.path_input}/dataset","*.*"))
+        files_in_dataset_folder = glob.glob(os.path.join(f"{path_data}/{dataset_object.path_input}/dataset","*.*"))
         if len(files_in_dataset_folder) == 0:
             print("folder", f'{dataset_object.path_input}/dataset', "is empty")
             sys.exit(1)

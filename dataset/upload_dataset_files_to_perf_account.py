@@ -20,11 +20,11 @@ def upload_files(services:object, dataset_id: str, scenario_directory: str):
     # create is not exists
     create_container_upsert(organizarion_id_lower)
 
-    for dataset_csv_file in os.listdir(f"./data/{scenario_directory}/dataset"):
+    for dataset_csv_file in os.listdir(f"{services.paths.data}/{scenario_directory}/dataset"):
         # for each file in dataset
         blob_client = blob_service_client.get_blob_client(
             container=f"{organizarion_id_lower}",
             blob=f"{workspace_id_lower}/datasets/{dataset_id_id_lower}/{dataset_csv_file}"
         )
-        with open(f"./data/{scenario_directory}/dataset/{dataset_csv_file}", "rb") as data:
+        with open(f"{services.paths.data}/{scenario_directory}/dataset/{dataset_csv_file}", "rb") as data:
             blob_client.upload_blob(data)

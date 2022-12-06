@@ -9,6 +9,7 @@
     - Clean up scenario created for test
 """
 import sys
+import os
 from time import sleep
 from results.get_logs import get_logs
 from results.export_results import export_results_detailed
@@ -33,7 +34,7 @@ def run_main_flow(services: object, scenario_obj: object):
 
     # create dataset
     dataset_created_id = create_dataset_flow(services, scenario_obj)
-    # dataset_created_id = "d-8enw3r6rlpqz"
+
     # Create scenario
     scenario_created = create_scenario_flow(services, scenario_obj, dataset_created_id)
 
@@ -43,14 +44,16 @@ def run_main_flow(services: object, scenario_obj: object):
     # collect and upload logs
     get_logs(services, dataset_created_id, scenario_created.id, scenario_run_created.id, scenario_obj)
 
-
 if __name__ == '__main__':
-
+    HOME = sys.argv[1] if len(sys.argv) > 1 else os.getcwd()
+    path_data = os.path.join(HOME, "data")
+    path_logs = os.path.join(HOME, "logs")
+    path_summary = os.path.join(HOME, "summary")
     # clean up data, logs and summary
-    clean_up_data_folder()
+    clean_up_data_folder(path_data, path_logs, path_summary)
 
     # get global keys
-    api_client, organization, solution, workspace, name_file_storage, connector, connector_type, scenarios = get_scenarios()
+    api_client, organization, solution, workspace, name_file_storage, connector, connector_type, scenarios = get_scenarios(path_data, HOME)
     if api_client is not None:
         # build services to share
         services_object = Services(
@@ -63,6 +66,11 @@ if __name__ == '__main__':
                 'name': connector.name,
                 'url': connector.url,
                 'type': connector_type,
+            },
+            {
+                'data': path_data,
+                'logs': path_logs,
+                'summary': path_summary
             }
         )
 
@@ -82,10 +90,10 @@ if __name__ == '__main__':
     replace_run_template(services_object, "basicpool")
 
     print('Uploading performance results to storage...')
-    export_results_detailed(name_file_storage)
-    export_results_global(name_file_storage)
+    export_results_detailed(path_logs, name_file_storage)
+    export_results_global(path_logs, name_file_storage)
     export_main_report(services_object, name_file_storage)
     sleep(1)
-    zip_results_files()
+    zip_results_files(services_object)
     RUN_TEST_ID = upload_result_file(services_object)
     generate_sas_token(services_object, RUN_TEST_ID)

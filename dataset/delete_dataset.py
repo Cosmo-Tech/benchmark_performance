@@ -8,6 +8,7 @@ from azure.storage.blob import BlobServiceClient
 
 def delete_dataset_workspace(services: object, dataset_input: str, dataset_id: str):
     """delete datatset on workspace storage blob"""
+    path_data = services.paths.data
     connection_string = config('CONNECTION_STRING')
     # blob connection client
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
@@ -19,7 +20,7 @@ def delete_dataset_workspace(services: object, dataset_input: str, dataset_id: s
 
     directory_name_in_storage = f"{workspace_id_lower}/datasets/{dataset_id}"
 
-    local_dir_dataset = f"./data/{dataset_input}/dataset"
+    local_dir_dataset = f"{path_data}/{dataset_input}/dataset"
     for csv_file in os.listdir(local_dir_dataset):
         filename = os.path.join(directory_name_in_storage, csv_file)
         container_client.delete_blob(filename)

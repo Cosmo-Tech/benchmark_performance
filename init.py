@@ -1,6 +1,11 @@
 """Script to create .env and comsotest.config.yml files"""
+import sys
+import os
+
 if __name__ == '__main__':
-    with open('.env', 'w', encoding='utf-8') as file_env:
+    HOME = sys.argv[1]
+    path = os.path.join(HOME, ".env")
+    with open(path, 'w', encoding='utf-8') as file_env:
         ENV_SAMPLE = """ACCOUNT_NAME=
 ACCOUNT_KEY=
 CONNECTION_STRING=
@@ -8,7 +13,8 @@ CONNECTION_STRING=
         file_env.write(ENV_SAMPLE)
         print(".env file... OK")
 
-    with open('./cosmotest.config.yml', 'w', encoding='utf-8') as file:
+    path = os.path.join(HOME, "cosmotest.config.yml")
+    with open(path, 'w', encoding='utf-8') as file:
         CONFIG_SAMPLE = """azure:
     tenant_id: yout_tenant_id
     client_id: yout_client_id
@@ -25,6 +31,7 @@ cosmo_test:
         name: Supply Chain Dev                          # information only (required)
     solution:
         id: SOL-0xAAgEvr3J                              # your solution (required)
+        version: 1.0.0                                  # your solution version (required)
         name: Supply Chain Solution                     # information only (required)
     connector:
         id: c-q2859zy34wmm                              # connector AKS or ADT (required)

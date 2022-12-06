@@ -21,7 +21,7 @@ Solution team will create their own benchmark scenarios and execute them to obta
 #### Clone this project
 
 ```bash
-git clone git@github.com::Cosmo-Tech/benchmark_performance.git
+git clone https://github.com/Cosmo-Tech/benchmark_performance.git
 cd benchmark_performance
 pip install -r requirements.txt
 ```
@@ -199,6 +199,7 @@ cosmo_test:
         name: Supply Chain Dev                          # information only (required)
     solution:
         id: SOL-0xAAgEvr3J                              # your solution (required)
+        version: 1.0.0                                  # your solution version (required)
         name: Supply Chain Solution                     # information only (required)
     connector:
         id: c-q2859zy34wmm                              # connector AKS or ADT (required)
