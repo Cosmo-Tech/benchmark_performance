@@ -15,6 +15,7 @@ from results.get_logs import get_logs
 from results.export_results import export_results_detailed
 from results.export_results import export_results_global
 from results.export_results import export_main_report
+from results.export_results import export_report
 from scenario.get_scenarios import get_scenarios
 from scenario.create_scenario_flow import create_scenario_flow
 # from scenario.delete_scenario import delete_scenario
@@ -90,9 +91,10 @@ if __name__ == '__main__':
     replace_run_template(services_object, "basicpool")
 
     print('Uploading performance results to storage...')
-    export_results_detailed(path_logs, name_file_storage)
-    export_results_global(path_logs, name_file_storage)
-    export_main_report(services_object, name_file_storage)
+    description_page = export_main_report(services_object, name_file_storage)
+    global_page = export_results_global(path_logs, name_file_storage)
+    detail_page = export_results_detailed(path_logs, name_file_storage)
+    export_report(services_object, description_page, global_page, detail_page)
     sleep(1)
     zip_results_files(services_object)
     RUN_TEST_ID = upload_result_file(services_object)

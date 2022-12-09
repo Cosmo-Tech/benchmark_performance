@@ -5,6 +5,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+WIDTH = 15
+SUBTITLE_SIZE = 15
+
 def export_results(path_logs, filename_zip: str):
     """option 1 to results export a pdf"""
     offset_end=50
@@ -34,9 +37,9 @@ def export_results(path_logs, filename_zip: str):
         max_list.append(item['duration(s)'].iloc[len(item['step'])-1].max() + item['start_latence'].iloc[len(item['step'])-1].max())
 
     x_max = max(max_list) + offset_end
-    fig_size = 20 if len(data) >= 4 else 11
-    fig, a_x = plt.subplots(1, constrained_layout=True, figsize=(20,fig_size))
-    fig.suptitle(f'Result run test {filename_zip}', fontsize=11)
+    fig_size = WIDTH if len(data) >= 4 else 11
+    fig, a_x = plt.subplots(1, figsize=(WIDTH,fig_size))
+    fig.suptitle(f'Result run test {filename_zip}', fontsize=SUBTITLE_SIZE)
     a_x.set_xlabel('Duration (s)')
     a_x.set_xlim(left=0, right=x_max)
     a_x.grid('on', which='major', axis='x' )
@@ -48,9 +51,8 @@ def export_results(path_logs, filename_zip: str):
         a_x.bar_label(data, labels=item['duration(s)'], padding=3)
 
     a_x.legend()
-    fig.tight_layout(pad=2.0)
-
-    fig.savefig(f'{path_logs}/scenario_results.pdf', bbox_inches='tight')
+    fig.tight_layout(pad=5.0)
+    return fig
 
 
 def export_results_detailed(path_logs, filename_zip: str):
@@ -80,9 +82,8 @@ def export_results_detailed(path_logs, filename_zip: str):
     x_max = max(max_list) + 20
 
     if len(data) > 1:
-        fig_size = 20 if len(data) >= 4 else 11
-        fig, a_x = plt.subplots(len(data), 1, constrained_layout=True, figsize=(20,fig_size))
-        fig.suptitle(f'Results run test {filename_zip}', fontsize=11)
+        fig, a_x = plt.subplots(len(data), 1, figsize=(WIDTH,20))
+        fig.suptitle(f'Results run test {filename_zip}', fontsize=SUBTITLE_SIZE)
         for i, graph in enumerate(data):
             a_x[i].set_xlabel('Duration (s)')
             a_x[i].set_xlim(left=0, right=x_max)
@@ -94,8 +95,8 @@ def export_results_detailed(path_logs, filename_zip: str):
             a_x[i].bar_label(data, labels=graph['duration(s)'], padding=3)
             a_x[i].legend()
     else:
-        fig, a_x = plt.subplots(1, constrained_layout=True, figsize=(20,11))
-        fig.suptitle(f'Detailed Execution time by step {filename_zip}', fontsize=11)
+        fig, a_x = plt.subplots(1, figsize=(WIDTH,11))
+        fig.suptitle(f'Detailed Execution time by step {filename_zip}', fontsize=SUBTITLE_SIZE)
         a_x.set_xlabel('Execution time (s)')
         a_x.set_xlim(left=0, right=x_max)
         a_x.grid('on', which='major', axis='x' )
@@ -105,9 +106,8 @@ def export_results_detailed(path_logs, filename_zip: str):
         graph = a_x.barh(data[0]['step'], data[0]['duration(s)'], left=data[0]['start_latence'], height=0.8, label=data[0]['scenario_name'].iloc[0], color=colors[0])
         a_x.bar_label(graph, labels=data[0]['duration(s)'], padding=3)
         a_x.legend()
-
-    fig.tight_layout(pad=2.0)
-    fig.savefig(f'{path_logs}/scenario_results_detailed.pdf', bbox_inches='tight')
+    fig.tight_layout(pad=5.0)
+    return fig
 
 
 def export_results_global(path_logs, filename_zip: str):
@@ -125,17 +125,15 @@ def export_results_global(path_logs, filename_zip: str):
 
     dataframe_original = pd.concat([dataframe_original, original_df_steps])
 
-    dataframe_original['step'] = (dataframe_original['step']).apply(lambda y: '[Run/Engine]' if y.startswith('[Run/Engine]') else y) + (dataframe_original['scenario_name']).apply(lambda x: f' [{str(x)}] ')
+    dataframe_original['step'] = (dataframe_original['step']).apply(lambda y: 'workflow' if y.startswith('workflow') else y) + (dataframe_original['scenario_name']).apply(lambda x: f' [{str(x)}] ')
     dataframe_original['step'] = (dataframe_original['step']).apply(lambda y: y.replace('Container-1', ''))
 
-
-    dataframe_original = dataframe_original[dataframe_original["step"].str.startswith('[Run/Engine]')]
+    dataframe_original = dataframe_original[dataframe_original["step"].str.startswith('workflow')]
     x_max = dataframe_original['duration(s)'].max() + dataframe_original['start_latence'].max() + offset_end
     dataframe_original['total'] =  round(dataframe_original['duration(s)'] + dataframe_original['start_latence'], 2)
 
-    fig_size = 5 if len(dataframe_original['step']) >= 4 else 2
-    fig, a_x = plt.subplots(1, constrained_layout=True, figsize=(20,fig_size))
-    fig.suptitle(f'Total Execution time + latence, {filename_zip}', fontsize=11)
+    fig, a_x = plt.subplots(1, figsize=(WIDTH,5))
+    fig.suptitle(f'Total Execution time, {filename_zip}', fontsize=SUBTITLE_SIZE)
     a_x.set_xlabel('Execution time (s)')
     a_x.set_xlim(left=0, right=x_max)
     a_x.grid('on', which='major', axis='x' )
@@ -144,8 +142,8 @@ def export_results_global(path_logs, filename_zip: str):
 
     graph = a_x.barh(dataframe_original['step'], dataframe_original['total'], height=0.8)
     a_x.bar_label(graph, labels=dataframe_original['total'], padding=3)
-
-    fig.savefig(f'{path_logs}/scenario_results_global.pdf', bbox_inches='tight')
+    fig.tight_layout(pad=5.0)
+    return fig
 
 
 def export_main_report(services_object, filename_zip: str):
@@ -164,9 +162,8 @@ def export_main_report(services_object, filename_zip: str):
         data.append(dataframe_original[dataframe_original['cpu'] == str(cpu)])
 
 
-    fig, axs = plt.subplots(3,1, figsize=(15,15))
-    fig.suptitle(f'Result performance test {filename_zip}', fontsize=11)
-    plt.subplots_adjust(wspace=0.6, hspace=0.5)
+    fig, axs = plt.subplots(3,1, figsize=(WIDTH,18))
+    fig.suptitle(f'Result performance test {filename_zip}', fontsize=SUBTITLE_SIZE)
     #################################################
     for item in data:
         max_list = []
@@ -197,7 +194,7 @@ def export_main_report(services_object, filename_zip: str):
         axs[1].legend()
     ###############################################
     axs[0].set_axis_off()
-    interline = 0.05
+    interline = 0.07
     now = datetime.now()
     summary_headers = {
         "Date of test execution": f': {now.strftime("%D, %H:%M:%S")}',
@@ -215,28 +212,35 @@ def export_main_report(services_object, filename_zip: str):
             "Number of dataset": f": {str(len(scenario_id_list))}",
             "Dataset size": ": "+", ".join(size_list),
             "CPU size": ": "+", ".join(scenario_list)
-        },
-        "Main results/KPI's (high level)": { f'Data size: {k}' : f': {v} seconds, ({timedelta(seconds=int(v))})' for i,(k,v) in enumerate(result.items())},
+        }
     }
+    for cpu_index, cpu_item in enumerate(result_by_cpu):
+        summary_headers.update({ 
+            f"Main results/KPI's {scenario_list[cpu_index]}" : { f'Data size: {k}' : f': {v} seconds, ({timedelta(seconds=int(v))})' for i,(k,v) in enumerate(cpu_item.items())}
+        })
     margin_list = [len(w) for w in summary_headers]
     margin = max(margin_list)
     y_origin = 0
     for k, (head, valor) in enumerate(summary_headers.items()):
         x_origin = 0
-        axs[0].text(x_origin, 1-y_origin-interline*(k+1), str(head), fontsize=12, weight='bold', color="salmon")
+        axs[0].text(x_origin, 1-y_origin-interline*(k+1), str(head), fontsize=11, weight='bold', color="salmon")
         if isinstance(valor, dict):
             offset_inner = 0.01
             x_origin = x_origin + offset_inner
             for subtitle, valor in valor.items():
                 y_origin = y_origin + interline
-                axs[0].text(x_origin, 1-y_origin-interline*(k+1), f'• {str(subtitle)}', fontsize=12)
-                axs[0].text(x_origin+int(margin)/100-offset_inner, 1-y_origin-interline*(k+1), str(valor), fontsize=12)
+                axs[0].text(x_origin, 1-y_origin-interline*(k+1), f'• {str(subtitle)}', fontsize=11)
+                axs[0].text(x_origin+int(margin)/100-offset_inner, 1-y_origin-interline*(k+1), str(valor), fontsize=11)
         else:
-            axs[0].text(x_origin+int(margin)/100, 1-y_origin-interline*(k+1), str(valor), fontsize=12, color="salmon", weight='bold')
+            axs[0].text(x_origin+int(margin)/100, 1-y_origin-interline*(k+1), str(valor), fontsize=11, color="salmon", weight='bold')
 
     #################################################
     d_t = pd.DataFrame(result_by_cpu)
     d_t = d_t.transpose()
+    rename_columns = {}
+    for col_index, column in enumerate(scenario_list):
+        rename_columns.update({ col_index: str(column) })
+    d_t = d_t.rename(columns=rename_columns)
     d_t.to_csv(f"{path_logs}/performance-capacity.csv", mode='a', header=True, index=False)
     axs[2].set_axis_off()
     if len(d_t) >= 2:
@@ -248,9 +252,26 @@ def export_main_report(services_object, filename_zip: str):
             rowColours =["#FAF4D3"] * len(d_t.index),
             colColours =["#FAF4D3"] * len(d_t.index),
             cellLoc ='center',
-            loc ='upper left')
+            loc ='upper left',
+            bbox=[0, -0.3, 1, 0.275])
 
     #################################################
-    plt.tight_layout()
+    fig.tight_layout(pad=5.0)
+    return fig
 
-    fig.savefig(f'{path_logs}/scenario_results_report.pdf', bbox_inches='tight')
+from matplotlib.backends.backend_pdf import PdfPages
+def export_report(services_object, description_page, global_page, detail_page):
+    path_logs = services_object.paths.logs
+    with PdfPages(f"{path_logs}/report.pdf") as pdf:
+        pdf.savefig(description_page)
+        plt.close()
+
+        pdf.savefig(global_page)
+        plt.close()
+
+        pdf.savefig(detail_page)
+        plt.close()
+
+        d = pdf.infodict()
+        d['Title'] = 'Performance Tests - Report'
+        d['Author'] = 'Nibaldo Donoso'
