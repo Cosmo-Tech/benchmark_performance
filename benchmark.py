@@ -20,7 +20,6 @@ from results.export_results import export_main_report
 from results.export_results import export_report
 from scenario.get_scenarios import get_scenarios
 from scenario.create_scenario_flow import create_scenario_flow
-# from scenario.delete_scenario import delete_scenario
 from scenario_run.run_scenario_flow import run_scenario_flow
 from scenario_run.update_run_template import replace_run_template
 from dataset.create_dataset_flow import create_dataset_flow

@@ -190,38 +190,38 @@ azure:
 
 cosmo_test:
     organization:
-        id: O-gZYpnd27G7                                # your organization (required)
-        name: Cosmo Tech                                # information only (required)
+        id: O-gZYpnd27G7                                  # your organization (required)
+        name: Cosmo Tech                                  # information only (required)
     workspace:
-        id: W-QPpQ47r2L9                                # your workspace (required)
-        name: Supply Chain Dev                          # information only (required)
+        id: W-QPpQ47r2L9                                  # your workspace (required)
+        name: Supply Chain Dev                            # information only (required)
     solution:
-        id: SOL-0xAAgEvr3J                              # your solution (required)
-        version: 1.0.0                                  # your solution version (required)
-        name: Supply Chain Solution                     # information only (required)
+        id: SOL-0xAAgEvr3J                                # your solution (required)
+        version: 1.0.0                                    # your solution version (required)
+        name: Supply Chain Solution                       # information only (required)
     connector:
-        id: c-q2859zy34wmm                              # connector AKS or ADT (required)
-        name: AKS                                       # information only (required)
-        url: ""                                         # URL ADT
+        id: c-q2859zy34wmm                                # connector AKS or ADT (required)
+        name: AKS                                         # information only (required)
+        url: ""                                           # URL ADT
         
-    name_file_storage: scenario_demo_test.zip           # filename on your 'permformance-datasets' container
+    name_file_storage: scenario_demo_test.zip             # filename on your 'permformance-datasets' container
     scenarios:
         
         "1":                                              # select a name (string required)
             name: "large basicpool"                       # select a size (number or string required)
-            size: 100000                                  # select a name (string required)
+            size: 100000k                                 # select a name (string required)
             compute_size: "basicpool"                     #'basicpool' or 'highcpu'
             dataset:
                 name: "performance large size basicpool"  # select a name
                 path_input: "scenario_a"                  # folder name in scenario_demo_test.zip
 
         "2":                                            
-            name: "medium highcpu"
-            size: 10000
-            compute_size: "highcpu"
+            name: "medium basicpool"
+            size: 10000k
+            compute_size: "basicpool"
             dataset:
-                name: "performance large size highcpu"
-                path_input: "scenario_a"                  # see notes
+                name: "performance medium size basicpool"
+                path_input: "scenario_b"                  # see notes
 ```
 
 </br>

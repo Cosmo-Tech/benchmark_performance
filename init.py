@@ -3,7 +3,7 @@ import sys
 import os
 
 if __name__ == '__main__':
-    HOME = sys.argv[1]
+    HOME = sys.argv[1] if len(sys.argv) > 1 else os.getcwd()
     path = os.path.join(HOME, ".env")
     with open(path, 'w', encoding='utf-8') as file_env:
         ENV_SAMPLE = """ACCOUNT_NAME=
@@ -24,38 +24,38 @@ CONNECTION_STRING=
 
 cosmo_test:
     organization:
-        id: O-gZYpnd27G7                                # your organization (required)
-        name: Cosmo Tech                                # information only (required)
+        id: O-gZYpnd27G7
+        name: Cosmo Tech
     workspace:
-        id: W-QPpQ47r2L9                                # your workspace (required)
-        name: Supply Chain Dev                          # information only (required)
+        id: W-QPpQ47r2L9
+        name: Supply Chain Dev
     solution:
-        id: SOL-0xAAgEvr3J                              # your solution (required)
-        version: 1.0.0                                  # your solution version (required)
-        name: Supply Chain Solution                     # information only (required)
+        id: SOL-0xAAgEvr3J
+        version: 1.0.0
+        name: Supply Chain Solution
     connector:
-        id: c-q2859zy34wmm                              # connector AKS or ADT (required)
-        name: AKS                                       # information only (required)
-        url: ""                                         # # URL ADT
+        id: c-q2859zy34wmm
+        name: AKS
+        url: ""
 
-    name_file_storage: scenario_demo_test.zip           # blob name in your 'permformance-datasets' container
+    name_file_storage: scenario_demo_test.zip
     scenarios:
-        
-        "1":                                                                # select a name (string required)
-            name: "large basicpool"                                         # select a size (number or string required)
-            size: 100000                                                    # select a name (string required)
-            compute_size: "basicpool"                                       # 'basicpool' or 'highcpu'
-            dataset:
-                name: "performance large size basicpool"                    # select a name
-                path_input: "scenario_a"                                    # folder's name in scenario_demo_test.zip
 
-        "2":                                            
-            name: "medium highcpu"
-            size: 10000
-            compute_size: "highcpu"
+        "1":
+            name: "large basicpool"
+            size: 100000k
+            compute_size: "basicpool"
             dataset:
-                name: "performance large size highcpu"
+                name: "performance large size basicpool"
                 path_input: "scenario_a"
+
+        "2":                
+            name: "medium basicpool"
+            size: 10000k
+            compute_size: "basicpool"
+            dataset:
+                name: "performance medium size basicpool"
+                path_input: "scenario_b"
 """
         file.write(CONFIG_SAMPLE)
         print("cosmotest.config.yml file... OK")

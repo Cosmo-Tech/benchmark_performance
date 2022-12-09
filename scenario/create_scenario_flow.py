@@ -2,6 +2,7 @@
 import os
 import json
 import glob
+from time import sleep
 from cosmotech_api import ApiException
 from cosmotech_api.api import scenario_api
 from cosmotech_api.model import scenario
@@ -18,6 +19,7 @@ def get_scenario_description(services, path_input: str):
     return json.load(scenario_description)
 
 def build_scenario_object(
+        services: object,
         scenario_data: object,
         scenario_name: str,
         dataset_id: str
@@ -25,6 +27,8 @@ def build_scenario_object(
     """build scenario object with parameters values and run_template_id"""
     # get information from json scenario
     run_template_id = scenario_data.get('runTemplateId')
+    # replace_run_template(services, run_template_id)
+    # sleep(4)
     parameters_values = build_parameter_values(
         scenario_data.get('parametersValues'),
         scenario_name
@@ -80,6 +84,7 @@ async def create_scenario_flow(services: object, scenario_obj: object, dataset_i
     scenario_data = get_scenario_description(services, f"{scenario_obj.dataset.path_input}")
     # create new scenario
     scenario_object = build_scenario_object(
+        services,
         scenario_data,
         scenario_obj.name,
         dataset_id
