@@ -31,7 +31,7 @@ class Logger(object, metaclass=SingletonType):
             pass
 
     async def send_message_to_app(self, message):
-        uri = "ws://localhost:1234"
+        uri = "ws://localhost:11234"
         try:
             async with websockets.connect(uri) as websocket:
                 await websocket.send(message)
