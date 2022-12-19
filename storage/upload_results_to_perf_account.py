@@ -6,11 +6,14 @@ from zipfile import ZipFile
 from datetime import date
 from decouple import config
 from azure.storage.blob import BlobServiceClient
+from utils.logger import Logger
+
+logger = Logger.__call__()
 
 CONTAINER_NAME_RESULTS = "performance-results"
 SUMMARY_ZIP_NAME = "results-summary.zip"
 
-def upload_result_file(services:object) -> str:
+async def upload_result_file(services:object) -> str:
     """upoload results files to storage container performance-results"""
     path_summary = services.paths.summary
     connection_string = config('CONNECTION_STRING')
@@ -18,7 +21,7 @@ def upload_result_file(services:object) -> str:
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
 
     run_test_id = str(uuid.uuid4())
-    print("run test id: ", run_test_id)
+    await logger.logger(f"run test id: {run_test_id}")
     file_to_upload = SUMMARY_ZIP_NAME
 
     # Create a blob client using the local file name as the name for the blob

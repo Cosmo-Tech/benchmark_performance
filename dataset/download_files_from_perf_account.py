@@ -3,10 +3,13 @@ import sys
 import zipfile
 from decouple import config
 from azure.storage.blob import BlobServiceClient
+from utils.logger import Logger
+
+logger = Logger.__call__()
 
 CONTAINER_NAME_DATASETS = "performance-datasets"
 
-def download_files(path_data, name_file_storage: str):
+async def download_files(path_data, name_file_storage: str):
     """Download files from storaget performance container datasets"""
     connection_string = config('CONNECTION_STRING')
     # blob connection client
@@ -16,7 +19,7 @@ def download_files(path_data, name_file_storage: str):
     container_client = blob_service_client.get_container_client(container_id_lower)
     blob = blob_service_client.get_blob_client(container_id_lower, name_file_storage)
     if not blob.exists():
-        print(f"blob {name_file_storage} not exist")
+        await logger.logger(f"blob {name_file_storage} not exist")
         sys.exit(1)
 
     blob_name = name_file_storage

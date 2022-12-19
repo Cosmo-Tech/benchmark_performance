@@ -2,8 +2,11 @@
 import os
 import re
 import pandas as pd
+from utils.logger import Logger
 
-def get_info_from_logs(
+logger = Logger.__call__()
+
+async def get_info_from_logs(
         path_logs,
         string_to_parse: str,
         scenario_name: str,
@@ -15,7 +18,7 @@ def get_info_from_logs(
     """get information from logs of scenario_run"""
     pick = re.findall(r'(\[.+\])\sTotal\selapsed\stime:\s(\d{1,3}\.\d{4})', string_to_parse)
     for time_elapsed in pick:
-        print(time_elapsed[0], time_elapsed[1])
+        await logger.logger(f"{time_elapsed[0]} {time_elapsed[1]}")
 
     data = [[ scenario_name, node[0], '', '', node[1], 0, scenario_id, cpu, size ] for node in pick]
     columns = [

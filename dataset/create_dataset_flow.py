@@ -5,15 +5,18 @@ from cosmotech_api import ApiException
 from cosmotech_api.model.dataset import Dataset
 from cosmotech_api.model.dataset_connector import DatasetConnector
 from dataset.upload_dataset_files_to_perf_account import upload_files
+from utils.logger import Logger
 
-def create_dataset_http_request(dataset_api_instance, organization_id, dataset_object):
+logger = Logger.__call__()
+
+async def create_dataset_http_request(dataset_api_instance, organization_id, dataset_object):
     """create dataset request to cosmotech api"""
     try:
         dataset_created = dataset_api_instance.create_dataset(organization_id, dataset_object)
-        print(f"dataset with id  {dataset_created.id} created")
+        await logger.logger(f"dataset with id  {dataset_created.id} created")
         return dataset_created
     except ApiException as exception:
-        print(f"Exception when calling DatasetApi->create_dataset: {exception}")
+        await logger.logger(f"Exception when calling DatasetApi->create_dataset: {exception}")
         return None
 
 def build_dataset_object(scenario: object, services):
@@ -58,7 +61,7 @@ def build_dataset_with_connector(connector, dataset_created):
             )
     return dataset_created
 
-def update_dataset_files_in_azure_storage_container(
+async def update_dataset_files_in_azure_storage_container(
         dataset_api_instance,
         organization_id,
         dataset_created_with_connector
@@ -69,18 +72,18 @@ def update_dataset_files_in_azure_storage_container(
             organization_id,
             dataset_created_with_connector.id,
             dataset_created_with_connector)
-        print(f"dataset with id {dataset_updated.id} updated")
+        await logger.logger(f"dataset with id {dataset_updated.id} updated")
     except ApiException as exception:
-        print(f"Exception when calling DatasetApi->update_dataset: {exception}")
+        await logger.logger(f"Exception when calling DatasetApi->update_dataset: {exception}")
         return None
 
 
-def create_dataset_flow(services: object, scenario: object):
+async def create_dataset_flow(services: object, scenario: object):
     """create dataset flow: buidl object, creation request, update with connector and upload to storage"""
     dataset_api_instance = dataset_api.DatasetApi(services.api_client)
 
     dataset_object = build_dataset_object(scenario, services)
-    dataset_created = create_dataset_http_request(
+    dataset_created = await create_dataset_http_request(
         dataset_api_instance,
         services.organization.id,
         dataset_object
@@ -96,7 +99,7 @@ def create_dataset_flow(services: object, scenario: object):
             dataset_created_with_connector.id
         )
 
-    update_dataset_files_in_azure_storage_container(
+    await update_dataset_files_in_azure_storage_container(
         dataset_api_instance,
         services.organization.id,
         dataset_created_with_connector

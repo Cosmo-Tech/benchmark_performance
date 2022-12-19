@@ -13,8 +13,11 @@ from scenario.delete_scenario import delete_scenario
 from results.get_info_from_logs import get_info_from_logs
 from storage.upload_results_to_perf_account import upload_result_file, zip_results_files
 from storage.generate_sas_token import generate_sas_token
+from utils.logger import Logger
 
-def get_status_logs(
+logger = Logger.__call__()
+
+async def get_status_logs(
         scenario_run_api_instance: object,
         services: object,
         scenariorun_id: str,
@@ -33,7 +36,7 @@ def get_status_logs(
             scenariorun_id
         )
         if not failed:
-            get_info_from_logs(
+            await get_info_from_logs(
                 path_logs,
                 str(logs_response),
                 scenario_name,
@@ -45,10 +48,10 @@ def get_status_logs(
         with codecs.open(f"{path_logs}/scenariorun-logs-{scenario_name}.txt", 'w', encoding='utf-8') as file:
             pprint(logs_response, file)
     except ApiException as exception:
-        print(f"Exception when calling ScenariorunApi->get_scenario_run_cumulated_logs: {exception}")
+        await logger.logger(f"Exception when calling ScenariorunApi->get_scenario_run_cumulated_logs: {exception}")
 
 
-def get_logs(
+async def get_logs(
         services,
         dataset_id : str,
         scenario_id: str,
@@ -58,7 +61,8 @@ def get_logs(
     """main get logs from cosmotech api and build csv file"""
     scenario_api_instance = scenario_api.ScenarioApi(services.api_client)
     scenario_run_api_instance = scenariorun_api.ScenariorunApi(services.api_client)
-    current_state = ''
+    current_state = 'Running'
+    await logger.logger(f'[... state: {current_state} ...]')
     while True:
         try:
             scenario = scenario_api_instance.find_scenario_by_id(
@@ -75,12 +79,12 @@ def get_logs(
                     "DataIngestionFailure"
                 ]):
                 break
-            print(f'[... state: {current_state} ...]')
-            time.sleep(60)
+            time.sleep(1)
         except ApiException as exception:
-            print(f"Exception when calling ScenarioApi->find_scenario_by_id: {exception}")
+            await logger.logger(f"Exception when calling ScenarioApi->find_scenario_by_id: {exception}")
 
     if current_state == "Successful":
+        await logger.logger(f'[... state: {current_state} ...]')
         # get the status for the ScenarioRun
         try:
             api_response = scenario_run_api_instance.get_scenario_run_status(
@@ -88,7 +92,7 @@ def get_logs(
                 scenariorun_id
             )
         except ApiException as exception:
-            print(f"Exception when calling ScenariorunApi->get_scenario_run_status: {exception}")
+            await logger.logger(f"Exception when calling ScenariorunApi->get_scenario_run_status: {exception}")
 
         data = [[
             str(scenario_object.name),
@@ -159,9 +163,9 @@ def get_logs(
         # write performance indicators to a local csv
         log_path = f"{services.paths.logs}/performance-test.csv"
         write_headers = False if os.path.isfile(log_path) else True
-        print('[...Exporting performance results...]')
+        await logger.logger('[...Exporting performance results...]')
         df_log.to_csv(log_path, mode='a', header=write_headers, index=False)
-        get_status_logs(
+        await get_status_logs(
                 scenario_run_api_instance,
                 services,
                 scenariorun_id,
@@ -173,11 +177,11 @@ def get_logs(
             )
         # clean up
         if services.connector.type != "ADT Connector":
-            delete_dataset_workspace(services, scenario_object.dataset.path_input, dataset_id)
-        delete_scenario(services, scenario_id)
+            await delete_dataset_workspace(services, scenario_object.dataset.path_input, dataset_id)
+        await delete_scenario(services, scenario_id)
     else:
-        print(f"[{current_state}]")
-        get_status_logs(
+        await logger.logger(f"[{current_state}]")
+        await get_status_logs(
                 scenario_run_api_instance,
                 services,
                 scenariorun_id,
@@ -189,10 +193,10 @@ def get_logs(
             )
         # clean up
         if services.connector.type != "ADT Connector":
-            delete_dataset_workspace(services, scenario_object.dataset.path_input, dataset_id)
-        delete_scenario(services, scenario_id)
-        print('Uploading performance results to storage...')
+            await delete_dataset_workspace(services, scenario_object.dataset.path_input, dataset_id)
+        await delete_scenario(services, scenario_id)
+        await logger.logger('Uploading performance results to storage...')
         zip_results_files(services)
-        run_test_id = upload_result_file(services)
-        generate_sas_token(services, run_test_id)
+        run_test_id = await upload_result_file(services)
+        await generate_sas_token(services, run_test_id)
         sys.exit(1)

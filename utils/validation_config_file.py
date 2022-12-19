@@ -6,16 +6,20 @@ import yaml
 from yaml.loader import SafeLoader
 from cosmotech_api import ApiClient
 from azure.identity import ClientSecretCredential
-from checks_functions.configuration import get_configuration
-from checks_functions.organization import check_organization_by_id
-from checks_functions.workspaces import check_workspace_by_id
-from checks_functions.solutions import check_solution_by_id
-from checks_functions.connectors import check_connector_by_id
+from utils.configuration import get_configuration
+from utils.organization import check_organization_by_id
+from utils.workspaces import check_workspace_by_id
+from utils.solutions import check_solution_by_id
+from utils.connectors import check_connector_by_id
+from utils.logger import Logger
 sys.dont_write_bytecode=True
+
+logger = Logger.__call__()
 
 class Env():
     """Class to convert dict to object"""
     id = ""
+    url= ""
     connector_type: ""
     connector_url: ""
     run_template= ""
@@ -65,28 +69,28 @@ class Services:
             'summary': paths.get('summary')
         })
 
-def verification(parameter_list: list):
+async def verification(parameter_list: list):
     """Verification de key in list generic"""
     for item in parameter_list[0]:
         if item in parameter_list[1]:
             continue
-        print(f"There is no '{item}' key in cosmotest.config file")
-        print(f"Please use these keys: {parameter_list[1]}")
+        await logger.logger(f"There is no '{item}' key in cosmotest.config file")
+        await logger.logger(f"Please use these keys: {parameter_list[1]}")
         return [False for item in range(3)]
 
     for item in parameter_list[1]:
         if item in parameter_list[0]:
             continue
-        print(f"There is no '{item}' key cosmotest.config file")
-        print(f"Please use these keys: {parameter_list[1]}")
+        await logger.logger(f"There is no '{item}' key cosmotest.config file")
+        await logger.logger(f"Please use these keys: {parameter_list[1]}")
         return [False for item in range(3)]
     return [True for item in range(3)]
 
 
-def check_root_keys(env, env_object):
+async def check_root_keys(env, env_object):
     """check key of root config file"""
     list_root_keys = ['azure', 'cosmo_test']
-    response = verification([list(env.keys()), list_root_keys])
+    response = await verification([list(env.keys()), list_root_keys])
     if all(response):
         azure = env_object.azure
         cosmo = env_object.cosmo_test
@@ -94,7 +98,7 @@ def check_root_keys(env, env_object):
     return (None, None, None, False)
 
 
-def check_azure_keys(azure):
+async def check_azure_keys(azure):
     """check azure keys in config file"""
     list_azure_keys = [
         'tenant_id',
@@ -105,15 +109,15 @@ def check_azure_keys(azure):
     ]
 
     if not azure:
-        print('please add keys in azure section: ', list_azure_keys)
+        await logger.logger(f'please add keys in azure section: {list_azure_keys}')
         sys.exit(1)
 
-    response = verification([azure, list_azure_keys])
+    response = await verification([azure, list_azure_keys])
     if all(response):
         return (Env(azure), True)
     return (None, False)
 
-def check_cosmo_keys(cosmo):
+async def check_cosmo_keys(cosmo):
     """check cosmo keys in config file"""
     list_cosmo_keys = [
         'organization',
@@ -125,105 +129,105 @@ def check_cosmo_keys(cosmo):
     ]
 
     if not cosmo:
-        print('please add keys in cosmo_test section: ', list_cosmo_keys)
+        await logger.logger(f'please add keys in cosmo_test section: {list_cosmo_keys}')
         sys.exit(1)
 
-    response = verification([cosmo, list_cosmo_keys])
+    response = await verification([cosmo, list_cosmo_keys])
     if all(response):
         return (Env(cosmo), True)
     return (None, False)
 
-def check_cosmo_organization_keys(organization):
+async def check_cosmo_organization_keys(organization):
     """check organization keys on cosmo_test section config file"""
     list_keys = ['id', 'name']
 
     if not organization:
-        print(f'please add keys in {organization} section: ', list_keys)
+        await logger.logger(f'please add keys in {organization} section: {list_keys}')
         sys.exit(1)
 
-    response = verification([organization, list_keys])
+    response = await verification([organization, list_keys])
     if all(response):
         return (Env(organization), True)
     return (None, False)
 
 
-def check_cosmo_workspace_keys(workspace):
+async def check_cosmo_workspace_keys(workspace):
     """check workspace keys on cosmo_test section config file"""
     list_keys = ['id', 'name']
 
     if not workspace:
-        print('please add keys in workspace section: ', list_keys)
+        await logger.logger(f'please add keys in workspace section: {list_keys}')
         sys.exit(1)
 
-    response = verification([workspace, list_keys])
+    response = await verification([workspace, list_keys])
     if all(response):
         return (Env(workspace), True)
     return (None, False)
 
 
-def check_cosmo_solution_keys(solution):
+async def check_cosmo_solution_keys(solution):
     """check solution keys on cosmo_test section config file"""
     list_keys = ['id', 'name', 'version']
 
     if not solution:
-        print('please add keys in solution section: ', list_keys)
+        await logger.logger(f'please add keys in solution section: {list_keys}')
         sys.exit(1)
 
-    response = verification([solution, list_keys])
+    response = await verification([solution, list_keys])
     if all(response):
         return (Env(solution), True)
     return (None, False)
 
-def check_cosmo_scenarios_keys(item):
+async def check_cosmo_scenarios_keys(item):
     """check scenarios keys on cosmo_test config file"""
     list_keys = ['name', 'size', 'compute_size', 'dataset']
 
     if not item:
-        print('please add a list of scenario in scenarios section: ', list_keys)
+        await logger.logger(f'please add a list of scenario in scenarios section: {list_keys}')
         sys.exit(1)
 
-    response = verification([item, list_keys])
+    response = await verification([item, list_keys])
     if all(response):
         return (Env(item), True)
     return (None, False)
 
-def check_connector_keys(connector):
+async def check_connector_keys(connector):
     """check connector keys on cosmo_test section config file"""
     list_keys = ['id', 'name', 'url']
 
     if not connector:
-        print('please add keys in connector section: ', list_keys)
+        await logger.logger(f'please add keys in connector section:  {list_keys}')
         sys.exit(1)
 
-    response = verification([connector, list_keys])
+    response = await verification([connector, list_keys])
     if all(response):
         return (Env(connector), True)
     return (None, False)
 
 
-def check_dataset_keys(dataset):
+async def check_dataset_keys(dataset):
     """check dataset keys on cosmo_test section config file"""
     list_keys = ['name','path_input']
     if not dataset:
-        print('please add keys in dataset section: ', list_keys)
+        await logger.logger(f'please add keys in dataset section: {list_keys}')
         sys.exit(1)
-    response = verification([dataset, list_keys])
+    response = await verification([dataset, list_keys])
     if all(response):
         return (Env(dataset), True)
     return (None, False)
 
 
-def verification_path_exists(path_data, dataset: object):
+async def verification_path_exists(path_data, dataset: object):
     """verificator if scenario path exist"""
     if not dataset.path_input:
-        print('The path input of dataset section is empty', f'ex: {path_data}/scenario_a')
+        await logger.logger(f'The path input of dataset section is empty ex: {path_data}/scenario_a')
         sys.exit(1)
     input_bool = os.path.isdir(f'{path_data}/{dataset.path_input}')
     if not input_bool:
-        print(f"The path '{path_data}/{dataset.path_input}' not exist")
+        await logger.logger(f"The path '{path_data}/{dataset.path_input}' not exist")
     return all([input_bool])
 
-def verification_keys_exists(
+async def verification_keys_exists(
         api_client: object,
         organization: object,
         workspace: object,
@@ -231,40 +235,40 @@ def verification_keys_exists(
     ):
     """verificator if keys on azure section exist and there are not empty"""
     if not organization.id:
-        print('the key id on organization section is empty')
+        await logger.logger('the key id on organization section is empty')
         sys.exit(1)
-    organization_bool = check_organization_by_id(api_client, organization.id)
+    organization_bool = await check_organization_by_id(api_client, organization.id)
 
     if not workspace.id:
-        print('the key id on workspace section is empty')
+        await logger.logger('the key id on workspace section is empty')
         sys.exit(1)
-    workspace_bool = check_workspace_by_id(api_client, organization.id, workspace.id)
+    workspace_bool = await check_workspace_by_id(api_client, organization.id, workspace.id)
 
     if not solution.id:
-        print('the key id on solution section is empty')
+        await logger.logger('the key id on solution section is empty')
         sys.exit(1)
 
-    solution_bool = check_solution_by_id(api_client, organization.id, solution.id)
+    solution_bool = await check_solution_by_id(api_client, organization.id, solution.id)
     return all([organization_bool, workspace_bool, solution_bool])
 
-def check_connector_exists(api_client: object, connector: object):
+async def check_connector_exists(api_client: object, connector: object):
     """check if connector key exist and is not empty"""
     if not connector.id:
-        print('connector id key is empty')
+        await logger.logger('connector id key is empty')
         sys.exit(1)
-    return check_connector_by_id(api_client, connector.id)
+    return await check_connector_by_id(api_client, connector.id)
 
-def read_config_file(home) -> dict:
+async def read_config_file(home) -> dict:
     """.env"""
     cosmotest = os.path.join(home, 'cosmotest.config.yml')
     if os.path.isfile(cosmotest):
         with open(cosmotest, "r", encoding="UTF-8") as config_file:
             data = yaml.load(config_file, Loader=SafeLoader)
             return data
-    print("No config file: cosmotest.config.yml", "please create it before run the test script")
+    await logger.logger("No config file: cosmotest.config.yml, please create it before run the test script")
     sys.exit(1)
 
-def get_api_client(azure: object):
+async def get_api_client(azure: object):
     """get api client cosmotech"""
     dictionary = {
         'tenant_id': azure.tenant_id,
@@ -275,7 +279,7 @@ def get_api_client(azure: object):
     }
     for item in enumerate(dictionary):
         if not dictionary.get(item[1]):
-            print(f'the key : {item[1]} of azure section is empty')
+            await logger.logger(f'the key : {item[1]} of azure section is empty')
             sys.exit(1)
 
     credential = ClientSecretCredential(azure.tenant_id, azure.client_id, azure.client_secret)
@@ -283,81 +287,80 @@ def get_api_client(azure: object):
     configuration = get_configuration(azure.cosmo_api_host, token)
     return ApiClient(configuration)
 
-def check_scenario_structure(path_data, cosmo: object):
+async def check_scenario_structure(path_data, cosmo: object):
     """check scenarios structure on config file"""
     for item in cosmo.scenarios:
         check_type = cosmo.scenarios[f"{item}"]
         if isinstance(check_type, str):
-            print(f"the item {item}: {check_type} is not permited in 'scenarios' section")
+            await logger.logger(f"the item {item}: {check_type} is not permited in 'scenarios' section")
             sys.exit(1)
 
         scenario = Env(cosmo.scenarios[f"{item}"])
 
         # check scenario keys
-        scenario, check_ok = check_cosmo_scenarios_keys(cosmo.scenarios[f"{item}"])
+        scenario, check_ok = await check_cosmo_scenarios_keys(cosmo.scenarios[f"{item}"])
         if not check_ok:
             sys.exit(1)
 
         # check dataset keys
-        dataset, check_ok = check_dataset_keys(scenario.dataset)
+        dataset, check_ok = await check_dataset_keys(scenario.dataset)
         if not check_ok:
             sys.exit(1)
 
         # verification if path exist
-        path_exists = verification_path_exists(path_data, dataset)
+        path_exists = await verification_path_exists(path_data, dataset)
         if not path_exists:
             sys.exit(1)
 
-
     return True
 
-def check_all_keys_in_config_file(env, env_object: object):
+async def check_all_keys_in_config_file(env, env_object: object):
     """check all keys in config file entry"""
     return_ok = True
 
     # root
-    azure, cosmo, check_ok = check_root_keys(env, env_object)
+    azure, cosmo, check_ok = await check_root_keys(env, env_object)
     if not check_ok:
         sys.exit(1)
 
     ## azure key
-    azure, check_ok = check_azure_keys(azure)
+    azure, check_ok = await check_azure_keys(azure)
     if not check_ok:
         sys.exit(1)
 
     ## cosmo key
-    cosmo, check_ok = check_cosmo_keys(cosmo)
+    cosmo, check_ok = await check_cosmo_keys(cosmo)
     if not check_ok:
         sys.exit(1)
 
     # organization key
-    organization, check_ok = check_cosmo_organization_keys(cosmo.organization)
+    organization, check_ok = await check_cosmo_organization_keys(cosmo.organization)
     if not check_ok:
         sys.exit(1)
 
     # workspace key
-    workspace, check_ok = check_cosmo_workspace_keys(cosmo.workspace)
+    workspace, check_ok = await check_cosmo_workspace_keys(cosmo.workspace)
     if not check_ok:
         sys.exit(1)
 
     # solution key
-    solution, check_ok = check_cosmo_solution_keys(cosmo.solution)
+    solution, check_ok = await check_cosmo_solution_keys(cosmo.solution)
     if not check_ok:
         sys.exit(1)
 
     # check connector keys
-    connector, check_ok = check_connector_keys(cosmo.connector)
+    connector, check_ok = await check_connector_keys(cosmo.connector)
     if not check_ok:
         sys.exit(1)
 
     #check connector exist
-    with get_api_client(azure) as api_client:
-        connector_type, check_ok = check_connector_exists(api_client, connector)
+    with await get_api_client(azure) as api_client:
+        connector_type, check_ok = await check_connector_exists(api_client, connector)
         if not check_ok:
             sys.exit(1)
 
     if not cosmo.scenarios:
-        print("No scenarios structure in config file yml.")
+        await logger.logger("No scenarios structure in config file yml.")
         sys.exit(1)
 
     if return_ok:

@@ -5,8 +5,11 @@ from decouple import config
 from cosmotech_api import ApiException
 from cosmotech_api.api import dataset_api
 from azure.storage.blob import BlobServiceClient
+from utils.logger import Logger
 
-def delete_dataset_workspace(services: object, dataset_input: str, dataset_id: str):
+logger = Logger.__call__()
+
+async def delete_dataset_workspace(services: object, dataset_input: str, dataset_id: str):
     """delete datatset on workspace storage blob"""
     path_data = services.paths.data
     connection_string = config('CONNECTION_STRING')
@@ -25,15 +28,15 @@ def delete_dataset_workspace(services: object, dataset_input: str, dataset_id: s
         filename = os.path.join(directory_name_in_storage, csv_file)
         container_client.delete_blob(filename)
 
-    delete_scenario_http_request(services, dataset_id)
-    print("clean up dataset with id:", dataset_id)
+    await delete_scenario_http_request(services, dataset_id)
+    await logger.logger(f"clean up dataset with id: {dataset_id}")
 
 
-def delete_scenario_http_request(services: object, dataset_id: str):
+async def delete_scenario_http_request(services: object, dataset_id: str):
     """Delete scenario from database"""
     dataset_api_instance = dataset_api.DatasetApi(services.api_client)
     try:
         dataset_api_instance.delete_dataset(services.organization.id, dataset_id)
     except ApiException as exception:
-        print(f"Exception when calling DatasetApi->delete_scenario: {exception}")
+        await logger.logger(f"Exception when calling DatasetApi->delete_scenario: {exception}")
         sys.exit(1)

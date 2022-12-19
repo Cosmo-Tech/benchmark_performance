@@ -6,9 +6,7 @@ from storage.create_container import create_container_upsert
 
 def upload_files(services:object, dataset_id: str, scenario_directory: str):
     """upload files to storage container"""
-
     connection_string = config('CONNECTION_STRING')
-
     # Create a blob service client
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
 

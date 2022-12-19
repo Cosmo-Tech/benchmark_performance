@@ -6,6 +6,9 @@ from cosmotech_api import ApiException
 from cosmotech_api.api import scenario_api
 from cosmotech_api.model import scenario
 from cosmotech_api.model import scenario_run_template_parameter_value
+from utils.logger import Logger
+
+logger = Logger.__call__()
 
 def get_scenario_description(services, path_input: str):
     """get scenario description from json file"""
@@ -55,7 +58,7 @@ def build_parameter_values(parameters_values: object, scenario_name: str):
                 ))
     return final_list
 
-def create_scenario_http_request(scenario_api_instance, services, scenario_object):
+async def create_scenario_http_request(scenario_api_instance, services, scenario_object):
     """create scenario request to cosmotech api"""
     try:
         scenario_created = scenario_api_instance.create_scenario(
@@ -63,12 +66,12 @@ def create_scenario_http_request(scenario_api_instance, services, scenario_objec
             services.workspace.id,
             scenario_object
         )
-        print(f"scenario with id: {scenario_created.id} / {scenario_created.state}", scenario_created.name)
+        await logger.logger(f"scenario with id: {scenario_created.id} / {scenario_created.state} {scenario_created.name}")
         return scenario_created
     except ApiException as exception:
-        print(f"Exception when calling ScenarioApi->create_scenario: {exception}")
+        await logger.logger(f"Exception when calling ScenarioApi->create_scenario: {exception}")
 
-def create_scenario_flow(services: object, scenario_obj: object, dataset_id: str):
+async def create_scenario_flow(services: object, scenario_obj: object, dataset_id: str):
     """init create scenario flow: build, creation request"""
     # instance scenario api
     scenario_api_instance = scenario_api.ScenarioApi(services.api_client)
@@ -81,7 +84,7 @@ def create_scenario_flow(services: object, scenario_obj: object, dataset_id: str
         scenario_obj.name,
         dataset_id
     )
-    scenario_created = create_scenario_http_request(
+    scenario_created = await create_scenario_http_request(
         scenario_api_instance,
         services,
         scenario_object

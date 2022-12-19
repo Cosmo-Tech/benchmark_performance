@@ -26,8 +26,6 @@ cd benchmark_performance
 pip install -r requirements.txt
 ```
 
-After installation, you have to initialize your test environement.
-
 </br>
 
 ### Environement settings
@@ -41,7 +39,7 @@ python3 init.py
 # python (windows)
 python init.py
 ```
-After creation, add ```🔑 Access keys``` of your storage account
+Add storage account ```🔑 Access keys``` to .env file 
 
 #### Create your containers for your benchmark
 ```bash
@@ -90,7 +88,7 @@ Note 1: This is the scenario description (example)
     "parametersValues": [
         {
             "parameterId": "scenario_name",
-            "value": "%replace by config file%",
+            "value": "%replaced by config file%",
             "varType": "string",
             "isInherited": false
         },
@@ -179,7 +177,7 @@ Note 1: This is the scenario description (example)
 </br>
 </br>
 
-### Configure your ```cosmotest.config.yml``` with your benchmark zip file
+### Set up your ```cosmotest.config.yml``` with your benchmark zip file
 ---
 
 ```yml

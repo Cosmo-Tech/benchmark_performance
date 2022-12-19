@@ -4,11 +4,14 @@ from datetime import date
 from datetime import datetime, timedelta
 from decouple import config
 from azure.storage.blob import generate_blob_sas, BlobSasPermissions
+from utils.logger import Logger
+
+logger = Logger.__call__()
 
 CONTAINER_NAME_RESULTS = "performance-results"
 SUMMARY_ZIP_NAME = "results-summary.zip"
 
-def generate_sas_token(services: object, run_test_id: str):
+async def generate_sas_token(services: object, run_test_id: str):
     """Generate sas token to shared your results"""
     account_name = config('ACCOUNT_NAME')
     account_key = config('ACCOUNT_KEY')
@@ -31,7 +34,7 @@ def generate_sas_token(services: object, run_test_id: str):
             permission=blob_permission
         )
 
-        print(f'https://{account_name}.blob.core.windows.net/{CONTAINER_NAME_RESULTS}/{blob_name}?{url}')
+        await logger.logger(f'https://{account_name}.blob.core.windows.net/{CONTAINER_NAME_RESULTS}/{blob_name}?{url}')
     else:
-        print("check your .env file")
+        await logger.logger("check your .env file")
         sys.exit(1)
