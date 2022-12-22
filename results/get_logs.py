@@ -79,7 +79,7 @@ async def get_logs(
                     "DataIngestionFailure"
                 ]):
                 break
-            time.sleep(1)
+            time.sleep(60)
         except ApiException as exception:
             await logger.logger(f"Exception when calling ScenarioApi->find_scenario_by_id: {exception}")
 
