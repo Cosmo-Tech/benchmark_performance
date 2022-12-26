@@ -81,15 +81,15 @@ async def main(data_folder: str, logs_folder: str, summary_folder: str, home_fol
         scenario_object = Env(scenario)
         scenario_object.dataset = Env(scenario_object.dataset)
 
-        replace_run_template(services_object, scenario_object.compute_size)
-        await logger.logger(f"Update run_template to computeSize: {scenario_object.compute_size} ...")
+        # replace_run_template(services_object, scenario_object.compute_size)
+        # await logger.logger(f"Update run_template to computeSize: {scenario_object.compute_size} ...")
         # wait update done
-        sleep(4)
+        # sleep(4)
         # run scenario flow
         await run_main_flow(services_object, scenario_object)
 
     # come back to basicpool
-    replace_run_template(services_object, "basicpool")
+    # replace_run_template(services_object, "basicpool")
 
     await logger.logger('Uploading performance results to storage...')
     description_page = export_main_report(services_object, name_file_storage)

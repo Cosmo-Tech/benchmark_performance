@@ -243,7 +243,7 @@ def export_main_report(services_object, filename_zip: str):
     d_t = d_t.rename(columns=rename_columns)
     d_t.to_csv(f"{path_logs}/performance-capacity.csv", mode='a', header=True, index=False)
     axs[2].set_axis_off()
-    if len(d_t) >= 2:
+    if len(d_t) >= 2 and len(result_x) > 1:
         axs[2].table(
             cellText = [[ f'{val} s' for val in d_t.iloc[i]] for i,r in enumerate(d_t.index)],
             rowLabels = [f"Dataset size: {result_x[i]}" for i,r in enumerate(d_t.index)],

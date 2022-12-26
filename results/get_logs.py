@@ -82,6 +82,7 @@ async def get_logs(
             time.sleep(60)
         except ApiException as exception:
             await logger.logger(f"Exception when calling ScenarioApi->find_scenario_by_id: {exception}")
+            run_when_failed(scenario_run_api_instance, services, scenariorun_id, scenario_object, dataset_id, scenario_id)
 
     if current_state == "Successful":
         await logger.logger(f'[... state: {current_state} ...]')
@@ -93,6 +94,7 @@ async def get_logs(
             )
         except ApiException as exception:
             await logger.logger(f"Exception when calling ScenariorunApi->get_scenario_run_status: {exception}")
+            run_when_failed(scenario_run_api_instance, services, scenariorun_id, scenario_object, dataset_id, scenario_id)
 
         data = [[
             str(scenario_object.name),
@@ -181,22 +183,27 @@ async def get_logs(
         await delete_scenario(services, scenario_id)
     else:
         await logger.logger(f"[{current_state}]")
-        await get_status_logs(
-                scenario_run_api_instance,
-                services,
-                scenariorun_id,
-                str(scenario_object.name),
-                0.0,
-                str(scenario_object.compute_size),
-                str(scenario_object.size),
-                True
-            )
-        # clean up
-        if services.connector.type != "ADT Connector":
-            await delete_dataset_workspace(services, scenario_object.dataset.path_input, dataset_id)
-        await delete_scenario(services, scenario_id)
-        await logger.logger('Uploading performance results to storage...')
-        zip_results_files(services)
-        run_test_id = await upload_result_file(services)
-        await generate_sas_token(services, run_test_id)
-        sys.exit(1)
+        run_when_failed(scenario_run_api_instance, services, scenariorun_id, scenario_object, dataset_id, scenario_id)
+
+
+
+async def run_when_failed(scenario_run_api_instance, services, scenariorun_id, scenario_object, dataset_id, scenario_id):
+    await get_status_logs(
+            scenario_run_api_instance,
+            services,
+            scenariorun_id,
+            str(scenario_object.name),
+            0.0,
+            str(scenario_object.compute_size),
+            str(scenario_object.size),
+            True
+        )
+    # clean up
+    if services.connector.type != "ADT Connector":
+        await delete_dataset_workspace(services, scenario_object.dataset.path_input, dataset_id)
+    await delete_scenario(services, scenario_id)
+    await logger.logger('Uploading performance results to storage...')
+    zip_results_files(services)
+    run_test_id = await upload_result_file(services)
+    await generate_sas_token(services, run_test_id)
+    sys.exit(1)
