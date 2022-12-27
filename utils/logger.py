@@ -1,15 +1,7 @@
 """Logger"""
 import logging
 import websockets
-
-class SingletonType(type):
-    """Singleton for logger and send logger to websocket"""
-    _instances = {}
-
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(SingletonType, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
+from utils.singleton import SingletonType
 
 class Logger(object, metaclass=SingletonType):
     """Logger"""

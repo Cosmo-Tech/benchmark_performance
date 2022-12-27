@@ -4,22 +4,26 @@ from datetime import date
 from datetime import datetime, timedelta
 from decouple import config
 from azure.storage.blob import generate_blob_sas, BlobSasPermissions
-from utils.logger import Logger
+from utils.run_exit import run_exit
 
-logger = Logger.__call__()
+from utils.logger import Logger
+LOGGER = Logger.__call__()
+
+from utils.validation_config_file import Services
+SERVICES = Services.__call__()
 
 CONTAINER_NAME_RESULTS = "performance-results"
 SUMMARY_ZIP_NAME = "results-summary.zip"
 
-async def generate_sas_token(services: object, run_test_id: str):
+async def generate_sas_token(run_test_id):
     """Generate sas token to shared your results"""
     account_name = config('ACCOUNT_NAME')
     account_key = config('ACCOUNT_KEY')
     if account_name and account_key:
         container_name=CONTAINER_NAME_RESULTS
 
-        organizarion_id_lower = str(services.organization.id).lower()
-        workspace_id_lower = str(services.workspace.id).lower()
+        organizarion_id_lower = str(SERVICES.organization.get('id')).lower()
+        workspace_id_lower = str(SERVICES.workspace.get('id')).lower()
         file_to_download = SUMMARY_ZIP_NAME
         blob_name=f"{organizarion_id_lower}/{workspace_id_lower}/results/{date.today().isoformat()}/{run_test_id}/{file_to_download}"
 
@@ -34,7 +38,7 @@ async def generate_sas_token(services: object, run_test_id: str):
             permission=blob_permission
         )
 
-        await logger.logger(f'https://{account_name}.blob.core.windows.net/{CONTAINER_NAME_RESULTS}/{blob_name}?{url}')
+        await LOGGER.logger(f'https://{account_name}.blob.core.windows.net/{CONTAINER_NAME_RESULTS}/{blob_name}?{url}')
     else:
-        await logger.logger("check your .env file")
-        sys.exit(1)
+        await LOGGER.logger("check your .env file")
+        await run_exit(LOGGER)

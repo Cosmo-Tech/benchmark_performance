@@ -1,113 +1,100 @@
 """.env"""
 import os
 import glob
-import sys
 from dataset.download_files_from_perf_account import download_files
-from utils.validation_config_file import Env
 from utils.validation_config_file import check_scenario_structure
-from utils.validation_config_file import read_config_file
-from utils.validation_config_file import get_api_client
+from utils.read_config_file import read_config_file
 from utils.validation_config_file import check_all_keys_in_config_file
 from utils.validation_config_file import verification_keys_exists
+from utils.run_exit import run_exit
+
 from utils.logger import Logger
+LOGGER = Logger.__call__()
 
-logger = Logger.__call__()
+from utils.path import Path
+PATH = Path.__call__()
 
-async def get_scenarios(path_data: str, home_path: str) -> dict:
-    """retrieve all scenarios from config file"""
-    env = await read_config_file(home_path)
-    if not env:
-        await logger.logger("Please add configuration in config file.")
-        sys.exit(1)
-    env_object = Env(env)
+from utils.services import Services
+SERVICES = Services.__call__()
 
-    azure, cosmo, organization, workspace, solution, connector, connector_type, check_ok = await check_all_keys_in_config_file(env, env_object)
-    if not check_ok:
-        sys.exit(1)
+from utils.cosmo_api import CosmoClientApi
+COSMO_API = CosmoClientApi.__call__()
+
+async def get_scenarios():
+
+    env = await read_config_file()
+    await check_all_keys_in_config_file(env)
 
     # verification if keys values exist
-    with await get_api_client(azure) as api_client:
-        environment_cosmo_is_ok = await verification_keys_exists(
-            api_client,
-            organization,
-            workspace,
-            solution
-        )
+    await verification_keys_exists()
 
-    if environment_cosmo_is_ok:
-        if not os.path.isdir(path_data):
-            os.mkdir(path_data)
-            data_directory = os.listdir(path_data)
-            if len(data_directory) == 0:
-                download = await download_and_unzip_dataset_test_from_storage(path_data, cosmo.name_file_storage)
-                if not download:
-                    sys.exit(1)
+    if not os.path.isdir(PATH.DATA):
+        os.mkdir(PATH.DATA)
+        data_directory = os.listdir(PATH.DATA)
+        if len(data_directory) == 0:
+            download = await download_and_unzip_dataset_test_from_storage()
+            if not download:
+                await run_exit(LOGGER)
 
-        check_ok = await check_scenario_structure(path_data, cosmo)
-        if not check_ok:
-            sys.exit(1)
+        await check_scenario_structure()
 
         # check scenario items
-        scenarios_list = [cosmo.scenarios[f"{item}"] for item in cosmo.scenarios]
-        await check_scenario_item(path_data, scenarios_list)
+        scenarios_list = SERVICES.cosmo.get('scenarios')
+        await check_scenario_item(scenarios_list)
 
-        await logger.logger(f"{len(cosmo.scenarios.keys())} scenario(s)... configuration OK")
-        return (api_client, organization, solution, workspace, cosmo.name_file_storage, connector, connector_type, scenarios_list)
-    sys.exit(1)
+        await LOGGER.logger(f"{len(SERVICES.cosmo.get('scenarios'))} scenario(s)... configuration OK")
+        return scenarios_list
 
-async def download_and_unzip_dataset_test_from_storage(path_data, name_file_storage: str):
-    """download zip file and unzip it"""
-    return await download_files(path_data, name_file_storage)
+async def download_and_unzip_dataset_test_from_storage():
+    return await download_files()
 
-async def check_scenario_item(path_data, scenarios_list: list):
-    """check scenario items config file"""
-    for item in scenarios_list:
-        scenario_object = Env(item)
+async def check_scenario_item(scenarios_list):
+    for scenario_item in scenarios_list:
         dictionary_scenario = {
-            'name': scenario_object.name,
-            'size': scenario_object.size,
-            'compute_size': scenario_object.compute_size,
-            'dataset': scenario_object.dataset
+            'name': scenario_item.get('name'),
+            'size': scenario_item.get('size'),
+            'compute_size': scenario_item.get('compute_size'),
+            'dataset': scenario_item.get('dataset')
         }
+        for item in dictionary_scenario:
+            if item == 'compute_size':
+                if not dictionary_scenario.get(item) in ["highcpu", "basic", "memory"]:
+                    await LOGGER.logger("check your compute_size value: 'basic', 'highcpu', 'memory' (case sensitive)")
+                    await run_exit(LOGGER)
 
-        for item in enumerate(dictionary_scenario):
-            if item[1] == 'compute_size':
-                if not dictionary_scenario.get(item[1]) in ["highcpu", "basicpool", "memory"]:
-                    await logger.logger("check your compute_size value: 'basicpool', 'highcpu', 'memory' (case sensitive)")
-                    sys.exit(1)
-
-            if not dictionary_scenario.get(item[1]):
-                await logger.logger(f'the key : {item[1]} on scenario section is empty')
-                sys.exit(1)
+            if not dictionary_scenario.get(item):
+                await LOGGER.logger(f'the key : {item} on scenario section is empty')
+                await run_exit(LOGGER)
 
         # check dataset item
-        dataset_object = Env(scenario_object.dataset)
+        dataset_object = scenario_item.get('dataset')
+        path_input = dataset_object.get('path_input')
         dictionary_dataset = {
-            "name": dataset_object.name,
-            "path_input": dataset_object.path_input
+            "name": dataset_object.get('name'),
+            "path_input": dataset_object.get('path_input')
         }
-        for item in enumerate(dictionary_dataset):
-            if not dictionary_dataset.get(item[1]):
-                await logger.logger(f'the key : {item[1]} on dataset section is empty')
-                sys.exit(1)
+        for item in dictionary_dataset:
+            if not dictionary_dataset.get(item):
+                await LOGGER.logger(f'the key : {item} on dataset section is empty')
+                await run_exit(LOGGER)
 
-        scenario_folder = os.listdir(f'{path_data}/{dataset_object.path_input}')
+        scenario_folder = os.listdir(f'{PATH.DATA}/{path_input}')
         if len(scenario_folder) == 0:
-            await logger.logger(f"folder empty {dataset_object.path_input} no dataset folder")
-            sys.exit(1)
+            await LOGGER.logger(f"folder empty {path_input} no dataset folder")
+            await run_exit(LOGGER)
 
-        dataset_dir_exist = os.path.isdir(os.path.join(f'{path_data}/{dataset_object.path_input}','dataset'))
+        dataset_dir_exist = os.path.isdir(os.path.join(f'{PATH.DATA}/{path_input}','dataset'))
         if not dataset_dir_exist:
-            await logger.logger(f"not dataset folder in scenario {dataset_object.path_input}")
-            sys.exit(1)
+            await LOGGER.logger(f"not dataset folder in scenario {path_input}")
+            await run_exit(LOGGER)
 
-        json_file_name = glob.glob(os.path.join(f"{path_data}/{dataset_object.path_input}/","*.json"))
+        json_file_name = glob.glob(os.path.join(f"{PATH.DATA}/{path_input}/","*.json"))
         if len(json_file_name) == 0:
-            await logger.logger(f"No json scenario file in: {dataset_object.path_input}")
-            sys.exit(1)
+            await LOGGER.logger(f"No json scenario file in: {path_input}")
+            await run_exit(LOGGER)
 
         # check is dataset folder is empty
-        files_in_dataset_folder = glob.glob(os.path.join(f"{path_data}/{dataset_object.path_input}/dataset","*.*"))
+        files_in_dataset_folder = glob.glob(os.path.join(f"{PATH.DATA}/{path_input}/dataset","*.*"))
         if len(files_in_dataset_folder) == 0:
-            await logger.logger(f"folder {dataset_object.path_input}/dataset is empty")
-            sys.exit(1)
+            await LOGGER.logger(f"folder {path_input}/dataset is empty")
+            await run_exit(LOGGER)

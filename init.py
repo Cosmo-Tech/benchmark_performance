@@ -1,4 +1,3 @@
-"""Script to create .env and comsotest.config.yml files"""
 import sys
 import os
 
