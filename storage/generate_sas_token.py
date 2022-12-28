@@ -1,24 +1,18 @@
-""".env"""
-import sys
 from datetime import date
 from datetime import datetime, timedelta
 from decouple import config
 from azure.storage.blob import generate_blob_sas, BlobSasPermissions
 from utils.run_exit import run_exit
-
+from utils.constants import ACCOUNT_KEY, ACCOUNT_NAME, CONTAINER_NAME_RESULTS, SUMMARY_ZIP_NAME
 from utils.logger import Logger
 LOGGER = Logger.__call__()
 
 from utils.validation_config_file import Services
 SERVICES = Services.__call__()
 
-CONTAINER_NAME_RESULTS = "performance-results"
-SUMMARY_ZIP_NAME = "results-summary.zip"
-
 async def generate_sas_token(run_test_id):
-    """Generate sas token to shared your results"""
-    account_name = config('ACCOUNT_NAME')
-    account_key = config('ACCOUNT_KEY')
+    account_name = config(ACCOUNT_NAME)
+    account_key = config(ACCOUNT_KEY)
     if account_name and account_key:
         container_name=CONTAINER_NAME_RESULTS
 

@@ -1,10 +1,7 @@
-""".env"""
-# from cosmotech_api import ApiException
 from cosmotech_api.model import run_template
 from cosmotech_api.api import solution_api
 
-def replace_run_template(services: object, run_template_id: str, cpu: str = "basicpool"):
-    """replace compute size on run_template_id: Lever, MILPOprtimization, UncertaintyAnalysis, SensitivityAnalysis"""
+def replace_run_template(services, run_template_id, cpu = "basic"):
     solution_api_instance = solution_api.SolutionApi(services.api_client)
     run_template_object = None
     parameter_groups_list = []

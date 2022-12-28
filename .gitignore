@@ -2,6 +2,7 @@ __pycache__/
 data/
 logs/
 summary/
+input/
 ___*.py
 .env
 *.yml

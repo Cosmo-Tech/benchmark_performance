@@ -1,24 +1,25 @@
-""".env"""
 import os
 import re
 import pandas as pd
-from utils.logger import Logger
+from utils.constants import PERFORMANCE_STEPS_CSV
 
-logger = Logger.__call__()
+from utils.logger import Logger
+LOGGER = Logger.__call__()
+
+from utils.path import Path
+PATH = Path.__call__()
 
 async def get_info_from_logs(
-        path_logs,
-        string_to_parse: str,
-        scenario_name: str,
+        string_to_parse,
+        scenario_name,
         max_start_latence,
-        scenario_id: str,
-        cpu: str,
-        size: str
+        scenario_id,
+        cpu,
+        size
     ):
-    """get information from logs of scenario_run"""
     pick = re.findall(r'(\[.+\])\sTotal\selapsed\stime:\s(\d{1,3}\.\d{4})', string_to_parse)
     for time_elapsed in pick:
-        await logger.logger(f"{time_elapsed[0]} {time_elapsed[1]}")
+        await LOGGER.logger(f"{time_elapsed[0]} {time_elapsed[1]}")
 
     data = [[ scenario_name, node[0], '', '', node[1], 0, scenario_id, cpu, size ] for node in pick]
     columns = [
@@ -44,5 +45,5 @@ async def get_info_from_logs(
             n_temp.append(latence_temp)
 
     d_f['start_latence'] = pd.Series(n_temp)
-    write_headers = False if os.path.isfile(f"{path_logs}/performance-steps.csv") else True
-    d_f.to_csv(f"{path_logs}/performance-steps.csv", mode='a', header=write_headers, index=False)
+    write_headers = False if os.path.isfile(f"{PATH.LOGS}/{PERFORMANCE_STEPS_CSV}") else True
+    d_f.to_csv(f"{PATH.LOGS}/{PERFORMANCE_STEPS_CSV}", mode='a', header=write_headers, index=False)

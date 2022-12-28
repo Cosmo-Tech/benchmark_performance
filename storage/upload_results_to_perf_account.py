@@ -6,6 +6,7 @@ from zipfile import ZipFile
 from datetime import date
 from decouple import config
 from azure.storage.blob import BlobServiceClient
+from utils.constants import CONNECTION_STRING, CONTAINER_NAME_RESULTS, SUMMARY_ZIP_NAME
 
 from utils.path import Path
 PATH = Path.__call__()
@@ -16,12 +17,9 @@ LOGGER = Logger.__call__()
 from utils.validation_config_file import Services
 SERVICES = Services.__call__()
 
-CONTAINER_NAME_RESULTS = "performance-results"
-SUMMARY_ZIP_NAME = "results-summary.zip"
-
 async def upload_result_file():
     path_summary = PATH.SUMMARY
-    connection_string = config('CONNECTION_STRING')
+    connection_string = config(CONNECTION_STRING)
     # blob connection client
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
 

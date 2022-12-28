@@ -1,4 +1,3 @@
-""".env"""
 from cosmotech_api import ApiException
 from cosmotech_api.api import scenario_api
 from utils.run_exit import run_exit
