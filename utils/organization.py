@@ -18,5 +18,5 @@ async def check_organization_by_id(id):
         api_response = api_instance.find_organization_by_id(id)
         return api_response
     except ApiException as exception:
-        await LOGGER.logger(f"the organization with: '{id}' not exist")
+        await LOGGER.logger(f"Exception when calling OrganizationApi->find organization by id:  {exception}")
         await run_exit(LOGGER)

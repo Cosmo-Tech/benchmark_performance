@@ -16,6 +16,16 @@ class Services(object, metaclass=SingletonType):
     scenarios_created = []
     datasets_id = []
     run_scenarios = []
+
+    # run supply or asset ?
+    run_supply: bool = True
+    run_asset: bool = False
+
+    def set_run_supply(self, value):
+        self.run_supply = value
+
+    def set_run_asset(self, value):
+        self.run_asset = value
     
     def set_azure(self,azure):
         self.azure = azure

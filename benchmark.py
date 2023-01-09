@@ -1,5 +1,6 @@
 import sys
 import os
+import argparse
 import asyncio
 from utils.clean_up import clean_up_data_folder
 from utils.constants import DATASET, PATH_INPUT
@@ -15,6 +16,11 @@ from scenario.get_scenarios import get_scenarios
 from scenario.create_scenario_flow import create_scenario_flow
 from scenario.delete_scenario import delete_scenario
 from dataset.create_dataset_flow import create_dataset_flow
+
+parser = argparse.ArgumentParser(description='Flag if there is a supplychain or Asset test.')
+parser.add_argument('--supply', action='store_true')
+parser.add_argument('--asset', action='store_true')
+parser.add_argument('--home', action='store', default=f"{os.getcwd()}")
 
 from utils.logger import Logger
 LOGGER = Logger.__call__()
@@ -87,21 +93,29 @@ async def run_main_flow(scenario):
 
 
 async def main():
-    # get global keys
-    scenarios = await get_scenarios()
+    if SERVICES.run_supply:
+      # get global keys
+      scenarios = await get_scenarios()
 
-    # iteration scenarios
-    for scenario in scenarios:
-        # replace_run_template(services_object, scenario_object.compute_size)
-        await run_main_flow(scenario)
+      # iteration scenarios
+      for scenario in scenarios:
+          # replace_run_template(services_object, scenario_object.compute_size)
+          await run_main_flow(scenario)
 
-    run_scenarios = await RUN.run_scenario_async()
-    SERVICES.set_run_scenarios(run_scenarios)
+      run_scenarios = await RUN.run_scenario_async()
+      SERVICES.set_run_scenarios(run_scenarios)
 
-    await get_logs_accumulated()
+      await get_logs_accumulated()
+
+    else:
+      await LOGGER.logger('Not implemented yet')
+      await run_exit(LOGGER)
 
 if __name__ == '__main__':
-    HOME = sys.argv[1] if len(sys.argv) > 1 else os.getcwd()
-    PATH.__set_path__(HOME)
+    args = parser.parse_args()
+    PATH.__set_path__(args.home)
+    SERVICES.set_run_supply(args.supply)
+    SERVICES.set_run_asset(args.asset)
+
     clean_up_data_folder()
     asyncio.run(main())

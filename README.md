@@ -141,8 +141,8 @@ cosmo:
 
 ```bash
 # python3 (linux)
-python3 benchmark.py
+python3 benchmark.py --supply  [--asset]
 
 # python (windows)
-python benchmark.py
+python benchmark.py --supply [--asset]
 ```
