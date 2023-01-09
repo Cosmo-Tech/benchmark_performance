@@ -1,4 +1,3 @@
-""".env"""
 import os
 from dataset.download_files_from_perf_account import download_files
 from dataset.upload_dataset_files_to_perf_account import upload_input_files
@@ -8,6 +7,7 @@ from utils.validation_config_file import check_scenario_structure
 from utils.read_config_file import read_config_file
 from utils.validation_config_file import check_all_keys_in_config_file
 from utils.run_exit import run_exit
+from utils.check_structure_data_folder import check_structure_data_folder
 
 from utils.logger import Logger
 LOGGER = Logger.__call__()
@@ -23,14 +23,22 @@ COSMO_API = CosmoClientApi.__call__()
 
 
 async def download_zip_folder():
-    if os.path.isdir(PATH.DATA):
-        if len(os.listdir(PATH.DATA)) == 0:
-            await download_files()
+    if not os.path.isdir(PATH.DATA):
+        await LOGGER.logger("no data folder")
+        await run_exit(LOGGER)
+    if len(os.listdir(PATH.DATA)) == 0:
+        await download_files()
+        await check_structure_data_folder()
 
 async def upload_zip_file():
-    if os.path.isdir(PATH.INPUT):
-        if len(os.listdir(PATH.INPUT)) != 0:
-            await upload_input_files()
+    if not os.path.isdir(PATH.INPUT):
+        await LOGGER.logger("no input folder")
+        await run_exit(LOGGER)
+    if len(os.listdir(PATH.INPUT)) != 0:
+        await upload_input_files()
+    else:
+        await LOGGER.logger("no excel file in input folder")
+        await run_exit(LOGGER)
 
 async def get_scenarios():
 

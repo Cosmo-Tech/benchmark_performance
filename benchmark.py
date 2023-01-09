@@ -90,22 +90,15 @@ async def main():
     # get global keys
     scenarios = await get_scenarios()
 
-    # # iteration scenarios
-    # for scenario in scenarios:
-    #     # replace_run_template(services_object, scenario_object.compute_size)
-    #     await run_main_flow(scenario)
+    # iteration scenarios
+    for scenario in scenarios:
+        # replace_run_template(services_object, scenario_object.compute_size)
+        await run_main_flow(scenario)
 
-    # run_scenarios = await RUN.run_scenario_async()
-    # SERVICES.set_run_scenarios(run_scenarios)
+    run_scenarios = await RUN.run_scenario_async()
+    SERVICES.set_run_scenarios(run_scenarios)
 
-    # await get_logs_accumulated()
-
-    # for item in [
-    #     "s-p6k93xl86o3mz",
-    #     "s-pq208x7wqo83g",
-    #     "s-p4gz2xq54j2lp",
-    # ]:
-    #     await delete_scenario(item)
+    await get_logs_accumulated()
 
 if __name__ == '__main__':
     HOME = sys.argv[1] if len(sys.argv) > 1 else os.getcwd()
