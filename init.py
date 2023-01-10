@@ -5,9 +5,9 @@ from storage.create_container import create_container_upsert
 
 parser = argparse.ArgumentParser(description="Init script")
 parser.add_argument('--home', action='store', default=f"{os.getcwd()}")
-parser.add_argument('--account_name', action='store', default="cosmotestperf")
-parser.add_argument('--account_key', action='store', default="mea8sPwvnVRFIWgLLlyBJ+V92I+fMU+XflKP1fxefVhiQQsa8pgqticlGg8gPNJ4j4lI8jFDRwYu+AStlgJOow==")
-parser.add_argument('--connection_str', action='store', default="DefaultEndpointsProtocol=https;AccountName=cosmotestperf;AccountKey=mea8sPwvnVRFIWgLLlyBJ+V92I+fMU+XflKP1fxefVhiQQsa8pgqticlGg8gPNJ4j4lI8jFDRwYu+AStlgJOow==;EndpointSuffix=core.windows.net")
+parser.add_argument('--account_name', action='store', default="")
+parser.add_argument('--account_key', action='store', default="")
+parser.add_argument('--connection_str', action='store', default="")
 parser.add_argument('--tenant_id', action='store', default="e413b834-8be8-4822-a370-be619545cb49")
 parser.add_argument('--client_id', action='store', default="")
 parser.add_argument('--client_secret', action='store', default="")
