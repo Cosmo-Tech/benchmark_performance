@@ -6,9 +6,14 @@ Solution team will create their own benchmark scenarios and execute them to obta
 </br>
 
 ### Prerequisites
+
 - python >=3.9
+
 - Storage Account (with all permissions)
+  - find and note ```Account Name``` and ```Account Key``` values. You use this values later
+
 - Registration app
+
   1. Sign in to the Azure portal.
   - Choose the Azure AD tenant where you want to create your applications
   - Register the app
@@ -20,14 +25,15 @@ Solution team will create their own benchmark scenarios and execute them to obta
         * Select Register to create the application
         * In the app's registration screen, find and note the Application (client) ID. You use this value in your app's configuration file(s) later in your code.
         * Create a client secret and note it. You use this value in your app's configuration file(s) later in your code.
-        * Finally, add a permission Organization.Admin and grant admin consent for cosmotech.com
+        * Finally, add a permission ```Organization.Admin``` and grant admin consent for cosmotech.com
 - File zip that contains scenarios to run.
+
 ```bash
 # scenarios_demo.zip (example)
 ...
-├── dataset (optional)
+├── dataset #(required but it can be empty)
 │   ├── X # match in configuration file
-│   │   ├── file1.csv
+│   │   ├── file1.csv 
 │   │   ├── file2.csv
 │   │   └── file3.csv
 │   ├── M # match in configuration file
@@ -39,14 +45,14 @@ Solution team will create their own benchmark scenarios and execute them to obta
 │       ├── file2.csv
 │       └── file3.csv
 │
-├── scenario
+├── scenario #(required)
 │   ├─ scenario1 # match in configuration file
-│   │  ├── mass_lever_excel_file
+│   │  ├── mass_lever_excel_file #(required)
 │   │  │   └── lever_example.xlsx
 │   │  └── scenario1.json
 │   │
 │   ├── scenario2 # match in configuration file
-│   │  ├── mass_lever_excel_file
+│   │  ├── mass_lever_excel_file #(required)
 │   │  │   └── lever_example.xlsx
 │   │  └── scenario2.json # (example)
 ...
@@ -75,28 +81,11 @@ pip install -r requirements.txt
 #### Create ```.env``` and ```cosmotest.config.yml``` files
 ```bash
 # python3 (linux)
-python3 init.py
+python3 init.py --account_name <<ACCOUNT_NAME>> --account_key <<ACCOUNT_KEY>>
 
 # python (windows)
-python init.py
+python init.py --account_name <<ACCOUNT_NAME>> --account_key <<ACCOUNT_KEY>>
 ```
-Add storage account ```🔑 Access keys``` to .env file 
-
-#### Create your containers for your benchmark
-```bash
-# python3 (linux)
-python3 create_containers.py
-
-# python (windows)
-python create_containers.py
-```
-
-You will see two containers in your storage account
-- ```performance-datasets```
-- ```performance-results```
-
-</br>
-</br>
 
 ### Set up your ```cosmotest.config.yml``` with your benchmark zip file
 ---
@@ -114,7 +103,7 @@ cosmo:
   workspace_id: w-pr920k6lre0ym
   connector: AKS
   dataset: 
-    # optional if you want create a new dataset
+    # can be empty if you don't want to create a new dataset
     - name:
       path_input:
 

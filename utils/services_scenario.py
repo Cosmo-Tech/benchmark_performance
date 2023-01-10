@@ -24,21 +24,34 @@ class ServicesScenarios(object, metaclass=SingletonType):
         workspace_id = SERVICES.workspace.get('id')
 
         run_ids = []
-        with concurrent.futures.ProcessPoolExecutor() as executor:
-            results = { executor.submit(run_scenario_flow,
-                organization_id,
-                workspace_id,
-                scenario_id,
-                tenant_id, 
-                client_id, 
-                client_secret, 
-                cosmo_api_host, 
-                cosmo_api_scope) for scenario_id in self.scenarios }
+        for scenario_id in self.scenarios:
+            run_id = run_scenario_flow(
+                    organization_id,
+                    workspace_id,
+                    scenario_id,
+                    tenant_id, 
+                    client_id, 
+                    client_secret, 
+                    cosmo_api_host,
+                    cosmo_api_scope
+            )
+            run_ids.append(run_id)
 
-            for f in concurrent.futures.as_completed(results):
-                try:
-                    run_ids.append(f.result())                
-                except Exception as exc:
-                    print("Exception", exc)
+        # with concurrent.futures.ProcessPoolExecutor() as executor:
+        #     results = { executor.submit(run_scenario_flow,
+        #         organization_id,
+        #         workspace_id,
+        #         scenario_id,
+        #         tenant_id, 
+        #         client_id, 
+        #         client_secret, 
+        #         cosmo_api_host, 
+        #         cosmo_api_scope) for scenario_id in self.scenarios }
+
+        #     for f in concurrent.futures.as_completed(results):
+        #         try:
+        #             run_ids.append(f.result())                
+        #         except Exception as exc:
+        #             print("Exception", exc)
 
         return run_ids

@@ -216,9 +216,11 @@ def export_main_report():
         "Solution": {
             "Version": f": {SERVICES.solution.get('version')}",
             "Name": f": {SERVICES.solution.get('name')}",
-            "Number of dataset": f": {str(len(scenario_id_list))}",
-            "Dataset size": ": "+", ".join(size_list),
-            "CPU size": ": "+", ".join(scenario_list)
+        },
+        "Scenario": {
+            "Number of scenarios": f": {str(len(scenario_id_list))}",
+            "Dataset size": ": "+", ".join(list(set(size_list))),
+            "CPU size": ": "+", ".join(list(set(scenario_list)))
         }
     }
     for cpu_index, cpu_item in enumerate(result_by_cpu):
